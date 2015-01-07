@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{662CAFAD-5F44-41E1-A86F-5D4B10A32813}</ProjectGuid>
+    <RootNamespace>JhonnyAuto</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>./opencv/include;./zlib/include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>./opencv/lib;./zlib/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_core249d.lib;opencv_flann249d.lib;opencv_features2d249d.lib;opencv_imgproc249d.lib;opencv_nonfree249d.lib;opencv_calib3d249d.lib;opencv_highgui249d.lib;zdll.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>./opencv/include;./zlib/include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>./opencv_static;./zlib_static</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_calib3d249.lib;opencv_contrib249.lib;opencv_core249.lib;opencv_features2d249.lib;opencv_flann249.lib;opencv_gpu249.lib;opencv_highgui249.lib;opencv_imgproc249.lib;opencv_legacy249.lib;opencv_ml249.lib;opencv_nonfree249.lib;opencv_objdetect249.lib;opencv_ocl249.lib;opencv_photo249.lib;opencv_stitching249.lib;opencv_superres249.lib;opencv_ts249.lib;opencv_video249.lib;opencv_videostab249.lib;Version.lib;IlmImf.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;zlib.lib;zlibstatic.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CropImageDlg.h" />
+    <ClInclude Include="EventAction.h" />
+    <ClInclude Include="EventDlgLoop.h" />
+    <ClInclude Include="EventDlgMove.h" />
+    <ClInclude Include="EventDlgPressKey.h" />
+    <ClInclude Include="EventDlgSeparator.h" />
+    <ClInclude Include="EventDlgTouch.h" />
+    <ClInclude Include="EventDlgWait.h" />
+    <ClInclude Include="EventSend.h" />
+    <ClInclude Include="InputMouse.h" />
+    <ClInclude Include="JhonnyAbout.h" />
+    <ClInclude Include="JhonnyAdware.h" />
+    <ClInclude Include="JhonnyAuto.h" />
+    <ClInclude Include="JhonnyAutoCore.h" />
+    <ClInclude Include="JhonnyAutoDlg.h" />
+    <ClInclude Include="JhonnyItem.h" />
+    <ClInclude Include="JhonnyLoadingDlg.h" />
+    <ClInclude Include="JhonnyMain.h" />
+    <ClInclude Include="JhonnyRecpAuth.h" />
+    <ClInclude Include="JhonnyRectDlg.h" />
+    <ClInclude Include="JhonnyRegister.h" />
+    <ClInclude Include="JhonnyRunItem.h" />
+    <ClInclude Include="JhonnySignUp.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="RexAlgorithm.h" />
+    <ClInclude Include="RexInterface.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="unzip.h" />
+    <ClInclude Include="zip.h" />
+    <ClInclude Include="ZipHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CropImageDlg.cpp" />
+    <ClCompile Include="EventAction.cpp" />
+    <ClCompile Include="EventDlgLoop.cpp" />
+    <ClCompile Include="EventDlgMove.cpp" />
+    <ClCompile Include="EventDlgPressKey.cpp" />
+    <ClCompile Include="EventDlgSeparator.cpp" />
+    <ClCompile Include="EventDlgTouch.cpp" />
+    <ClCompile Include="EventDlgWait.cpp" />
+    <ClCompile Include="EventSend.cpp" />
+    <ClCompile Include="InputMouse.cpp" />
+    <ClCompile Include="JhonnyAbout.cpp" />
+    <ClCompile Include="JhonnyAdware.cpp" />
+    <ClCompile Include="JhonnyAuto.cpp" />
+    <ClCompile Include="JhonnyAutoCore.cpp" />
+    <ClCompile Include="JhonnyAutoDlg.cpp" />
+    <ClCompile Include="JhonnyItem.cpp" />
+    <ClCompile Include="JhonnyLoadingDlg.cpp" />
+    <ClCompile Include="JhonnyMain.cpp" />
+    <ClCompile Include="JhonnyRecpAuth.cpp" />
+    <ClCompile Include="JhonnyRectDlg.cpp" />
+    <ClCompile Include="JhonnyRegister.cpp" />
+    <ClCompile Include="JhonnyRunItem.cpp" />
+    <ClCompile Include="JhonnySignUp.cpp" />
+    <ClCompile Include="RexAlgorithm.cpp" />
+    <ClCompile Include="RexInterface.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="unzip.cpp" />
+    <ClCompile Include="zip.cpp" />
+    <ClCompile Include="ZipHelper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="JhonnyAuto.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="JhonnyAdware.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="JhonnyRecpAuth.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="res\JhonnyAuto.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Pictures\display\drag.ico" />
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\goto.ico" />
+    <Image Include="res\icon2.ico" />
+    <Image Include="res\if_item.bmp" />
+    <Image Include="res\image_touch.ico" />
+    <Image Include="res\image_wait.ico" />
+    <Image Include="res\JhonnyAuto.ico" />
+    <Image Include="res\loop.ico" />
+    <Image Include="res\main.bmp" />
+    <Image Include="res\press_key.ico" />
+    <Image Include="res\return.ico" />
+    <Image Include="res\separator.ico" />
+    <Image Include="res\touch.ico" />
+    <Image Include="res\wait.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="JhonnyAuto.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="JhonnyAuto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyAutoDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CropImageDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyAutoCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZipHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyRegister.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyRunItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unzip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyAdware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyAbout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgLoop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgWait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgTouch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgPressKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputMouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyRectDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgSeparator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyLoadingDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDlgMove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnyRecpAuth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JhonnySignUp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RexAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RexInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventSend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="JhonnyAuto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyAutoDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CropImageDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyAutoCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZipHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyRegister.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyRunItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unzip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyAdware.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyAbout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgWait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgTouch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgPressKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InputMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyRectDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgSeparator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyLoadingDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlgMove.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnyRecpAuth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JhonnySignUp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RexAlgorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RexInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventSend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="JhonnyAuto.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\JhonnyAuto.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="JhonnyAdware.htm" />
+    <None Include="JhonnyRecpAuth.htm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\JhonnyAuto.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\image_touch.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\image_wait.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\loop.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\touch.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\wait.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\press_key.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\if_item.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\main.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\separator.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\goto.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\return.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Pictures\display\drag.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\icon2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
