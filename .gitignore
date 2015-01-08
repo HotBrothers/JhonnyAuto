@@ -41,3 +41,36 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# =========================
+# Jhonny ignore files
+# =========================
+
+# Build Files
+Debug/
+Release/
+opencv/
+opencv_static/
+zlib/
+zllib_static/
+
+# Objects
+*.obj
+
+# Dynamic library links
+*.dll
+
+
+# Visual Studio environment files
+ipch/
+*.tlog
+*.aps
+*.opensdf
+*.sdf
+*.vcxproj.*
+*.suo
+*.lastbuildstate
+*.pch
+*.pdb
+
+
