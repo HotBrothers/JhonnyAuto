@@ -356,7 +356,7 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	targetWindow = NULL;
 	pTargetMainWindow = NULL;
 	isMainWindowMinimized = false;
-	core = new JhonnyAutoCore(&targetWindow, &transCoord, 0.85);
+	core = new JhonnyAutoCore(0.85);
 	isplayAndStopEnable = true;
 	StrCpyW(rootPath, _T(""));
 }
@@ -1380,13 +1380,12 @@ void JhonnyMain::playAndStop()
 			transCoord.x = targetDistance.x - winDistance.x;
 			transCoord.y = targetDistance.y - winDistance.y;
 			*/
+			/*
 			rectDlg->GetClientRect(&rectDlgRect);
 			rectDlg->ClientToScreen(&rectDlgRect);
 			transCoord.x = rectDlgRect.left - targetWindowRect.left;
 			transCoord.y = rectDlgRect.top - targetWindowRect.top;
-
-			
-			
+			*/		
 		}
 		
 		
@@ -1725,14 +1724,111 @@ void JhonnyMain::playCore()
 	CString strLine;
 	int i = startIndex;
 	startIndex = 0;
+
 	for(; i<actions.size(); i++)
 	{
 		if(threadExit==true)
 			break;
 		setListItemFocus(0);
 		selectItem(&listPlaylist, i);
-		if(actions.at(i)->getEventID() == 7)
+		switch (actions.at(i)->getEventID())
+		{
+		case ID_IMAGE_TOUCH:
+		case ID_TOUCH:
+			{
+				/*
+				RECT rectRT;
+				rectDlg->GetClientRect(&rectRT);
+				rectDlg->ClientToScreen(&rectRT);
+				POINT pt;
+				pt.x =	rectRT.left + ((EventTouch*)actions.at(i))->x;
+				pt.y =	rectRT.top + ((EventTouch*)actions.at(i))->y;
+				HWND targetHandle = ::WindowFromPoint(pt);*/
+				
+				RECT rectRT;
+				rectDlg->GetClientRect(&rectRT);
+				rectDlg->ClientToScreen(&rectRT);
+	
+				RECT rectParent;
+				pTargetMainWindow->GetClientRect(&rectParent);
+				pTargetMainWindow->ClientToScreen(&rectParent);
+				
+				POINT handlePt;
+				handlePt.x = rectRT.left + ((EventTouch*)actions.at(i))->x - rectParent.left;
+				handlePt.y = rectRT.top + ((EventTouch*)actions.at(i))->y - rectParent.top;	
+
+				CWnd* pWndMainTmp = pTargetMainWindow;
+				
+				HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+				HWND hTargetHandle = hTempHandle;
+				
+				while(hTempHandle != NULL)
+				{
+					CRect r;
+					CWnd* pWndChildTmp = CWnd::FromHandle(hTempHandle);
+
+					pWndChildTmp->GetWindowRect( r ); 
+					pWndMainTmp->ScreenToClient( r ); 
+					handlePt.x = handlePt.x - r.left;
+					handlePt.y = handlePt.y - r.top;
+					
+					hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+			
+					if(hTargetHandle == hTempHandle || hTempHandle == NULL)
+						break;
+
+					hTargetHandle = hTempHandle;
+				}
+
+				core->setTargetWindow(hTargetHandle);
+				/*
+				RECT WndTargetRT, WndMainRT;
+				CWnd* pWndTarget = CWnd::FromHandle (targetHandle);
+				CWnd* pWndMain = pWndTarget;
+				while(pWndMain->GetParent() != NULL)
+					pWndMain = pWndMain->GetParent();
+
+				pWndTarget->GetWindowRect(&WndTargetRT);
+				pWndMain->GetWindowRect(&WndMainRT);
+				POINT targetDistance={0};
+				targetDistance.x = WndTargetRT.left - WndMainRT.left;
+				targetDistance.y = WndTargetRT.top - WndMainRT.top;
+
+				POINT winDistance={0};
+				rectDlg->GetWindowRect(&rectDlgRect);
+				winDistance.x = WndMainRT.left - rectDlgRect.left;
+				winDistance.y = WndMainRT.top - rectDlgRect.top;
+
+				POINT transCoord;
+				transCoord.x = targetDistance.x - winDistance.x;
+				transCoord.y = targetDistance.y - winDistance.y;
+
+				
+				transCoord.x = rectDlgRect.left - WndTargetRT.left;
+				transCoord.y = rectDlgRect.top - WndTargetRT.top;
+				*/
+				RECT WndTargetRT;
+				POINT transCoord;
+
+				CWnd* pWndTarget = CWnd::FromHandle (hTargetHandle);
+				pWndTarget->GetWindowRect(&WndTargetRT);
+				rectDlg->GetClientRect(&rectDlgRect);
+				rectDlg->ClientToScreen(&rectDlgRect);
+
+				transCoord.x = rectDlgRect.left - WndTargetRT.left;
+				transCoord.y = rectDlgRect.top - WndTargetRT.top;
+					
+
+				core->setTransCoord(transCoord);
+			}
+			break;
+		case ID_GOTO:
 			returnIndexMain = i+1;
+			break;
+		default:
+			break;
+		}
+			
 		int result = actions.at(i)->doAction(core);
 		
 		

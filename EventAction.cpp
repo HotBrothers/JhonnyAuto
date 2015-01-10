@@ -61,10 +61,10 @@ int EventImageTouch::doAction(JhonnyAutoCore* core)
 	eventLog.Format(_T("[이미지터치] : %s, "), name);
 	if(core->doMatching(item, ifItems, name, &x, &y, &eventLog) == 0)
 	{
-		int tx = core->transCoord->x + x;
-		int ty = core->transCoord->y + y;
+		int tx = core->transCoord.x + x;
+		int ty = core->transCoord.y + y;
 
-		if(tx < core->transCoord->x || ty < core->transCoord->y || tx > core->transCoord->x + SEARCH_RECT_WIDTH || ty > core->transCoord->y + SEARCH_RECT_HEGIHT)
+		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
 			eventLog.Format(_T("실패-범위초과[이미지터치] : %s, (%d,%d)"), name, tx, ty);
 			return 0;
@@ -96,9 +96,9 @@ int EventImageWait::doAction(JhonnyAutoCore* core)
 	eventLog.Format(_T("[이미지찾기] : %s, "), name);
 	if(core->doMatching(item, ifItems, name, &x, &y, &eventLog) == 0)
 	{
-		int tx = core->transCoord->x + x;
-		int ty = core->transCoord->y + y;
-		if(tx < core->transCoord->x || ty < core->transCoord->y || tx > core->transCoord->x + SEARCH_RECT_WIDTH || ty > core->transCoord->y + SEARCH_RECT_HEGIHT)
+		int tx = core->transCoord.x + x;
+		int ty = core->transCoord.y + y;
+		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
 			eventLog.Format(_T("실패-범위초과[이미지찾기] : %s, (%d,%d)"), name, tx, ty);
 			return 0;
@@ -170,10 +170,10 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 	}
 	
 	// 터치좌표
-	int tx = point.x + x + core->transCoord->x;		
-	int ty = point.y + y + core->transCoord->y;
-	int dx = point.x + x + core->transCoord->x;
-	int dy = point.y + y + core->transCoord->y;
+	int tx = point.x + x + core->transCoord.x;		
+	int ty = point.y + y + core->transCoord.y;
+	int dx = point.x + x + core->transCoord.x;
+	int dy = point.y + y + core->transCoord.y;
 
 	/*
 	if (isAbsolute)
@@ -191,6 +191,7 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 		dy += dragY;
 	}
 
+	/*
 	if(tx < 0 || ty < 0 || tx > SEARCH_RECT_WIDTH || ty > SEARCH_RECT_HEGIHT ||
 		dx < 0 || dy < 0 || dx > SEARCH_RECT_WIDTH || dy > SEARCH_RECT_HEGIHT)
 	{
@@ -200,7 +201,7 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 			eventLog.Format(_T("실패-범위초과[터치] : %s, (%d,%d)"),name, tx, ty);
 		return 0;
 	}
-		
+	*/
 	if(isDrag)
 	{
 		eventLog.Format(_T("[드래그] : %s, (%d,%d)->(%d,%d)"), name, tx, ty, dx, dy);
@@ -315,7 +316,7 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 		eventLog.Format(_T("[터치] : %s, (%d,%d)"), name, tx, ty);
 		if(isRightClick == false)
 		{
-			EventSend::SendMouseEvent(*core->targetWindow, tx, ty, MOUSE_LCLICK);
+			EventSend::SendMouseEvent(core->targetWindow, tx, ty, MOUSE_LCLICK);
 			/*
 			SetCursorPos(tx, ty);
 			SetCursorPos(tx, ty);

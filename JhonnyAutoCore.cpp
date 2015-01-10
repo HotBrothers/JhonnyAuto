@@ -14,11 +14,9 @@ JhonnyAutoCore::JhonnyAutoCore()
 	threshold = 0.85;
 }
 
-JhonnyAutoCore::JhonnyAutoCore(HWND* _targetWindow, POINT* _transCoord, double _threshold)
+JhonnyAutoCore::JhonnyAutoCore( double _threshold)
 {
 	isPlaying = false;
-	targetWindow = _targetWindow;
-	transCoord = _transCoord;
 	threshold = _threshold;
 }
 

@@ -26,18 +26,19 @@ class JhonnyAutoCore
 {
 public:
 	JhonnyAutoCore();
-	JhonnyAutoCore::JhonnyAutoCore(HWND* _targetWindow, POINT* _transCoord, double _threshold);
+	JhonnyAutoCore::JhonnyAutoCore(double _threshold);
 	
 
 	
 
 	double threshold;
 	bool isPlaying;
-	POINT* transCoord;
-	HWND* targetWindow;
+	POINT transCoord;
+	HWND targetWindow;
 	
+	void setTargetWindow(HWND _targetWindow) { targetWindow = _targetWindow; }
 	void setThreshold(float _threshold){ threshold = _threshold;}
-	void setTransCoord(POINT* _transCoord){ transCoord = _transCoord;}
+	void setTransCoord(POINT _transCoord){ transCoord = _transCoord;}
 	bool captureScreen(HBITMAP* bitmap, BOOL isFullScreen);
 	bool hBitmap2Ipl(HBITMAP* hBmp, IplImage** pIplImage);
 	bool matching(IplImage* background, IplImage* object, CvPoint* rect ,double* returnScore, double threshold);

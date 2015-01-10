@@ -62,7 +62,8 @@ BOOL EventSend::SendMouseEvent(HWND hWnd, WORD posX1, WORD posY1, MOUSE_MACRO_EV
 	{
 		LPARAM lParam = MAKELPARAM(posX1, posY1);
 		PostMessage(hWnd, dwMsgDown, dwEvent, lParam);
-		PostMessage(hWnd, dwMsgUp, dwEvent, lParam);
+		//PostMessage(hWnd, dwMsgUp, dwEvent, lParam);
+		PostMessage(hWnd, dwMsgUp, 0, lParam);
 	}
 
 	// 리턴 처리 필요

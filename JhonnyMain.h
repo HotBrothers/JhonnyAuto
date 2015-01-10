@@ -79,7 +79,7 @@ public:
 	RECT targetWindowRect;
 	RECT targetMainWindowRect;
 	RECT rectDlgRect;
-	POINT transCoord;
+
 
 	RECT returnTargetWindowRect;
 	bool isMainWindowMinimized;
