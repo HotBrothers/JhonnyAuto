@@ -359,6 +359,8 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	core = new JhonnyAutoCore(0.85);
 	isplayAndStopEnable = true;
 	StrCpyW(rootPath, _T(""));
+	screenX = (int)GetSystemMetrics(SM_CXSCREEN);
+	screenY = (int)GetSystemMetrics(SM_CYSCREEN);
 }
 
 JhonnyMain::~JhonnyMain()
@@ -1353,12 +1355,10 @@ void JhonnyMain::playAndStop()
 		targetWindow = ::WindowFromPoint(pt);
 		if(NULL != targetWindow)
 		{
-			pTargetWindow = CWnd::FromHandle (targetWindow);
-			pTargetMainWindow = pTargetWindow;
+			pTargetMainWindow = CWnd::FromHandle (targetWindow);
 			while(pTargetMainWindow->GetParent() != NULL)
 				pTargetMainWindow = pTargetMainWindow->GetParent();
 
-			pTargetWindow->GetWindowRect(&targetWindowRect);
 			pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
 
 			/*
@@ -1736,15 +1736,11 @@ void JhonnyMain::playCore()
 		case ID_IMAGE_TOUCH:
 		case ID_TOUCH:
 			{
-				/*
-				RECT rectRT;
-				rectDlg->GetClientRect(&rectRT);
-				rectDlg->ClientToScreen(&rectRT);
-				POINT pt;
-				pt.x =	rectRT.left + ((EventTouch*)actions.at(i))->x;
-				pt.y =	rectRT.top + ((EventTouch*)actions.at(i))->y;
-				HWND targetHandle = ::WindowFromPoint(pt);*/
-				
+				int outCoord = 0;
+				if(isMainWindowMinimized)
+					outCoord = (int)GetSystemMetrics(SM_CYSCREEN);
+
+
 				RECT rectRT;
 				rectDlg->GetClientRect(&rectRT);
 				rectDlg->ClientToScreen(&rectRT);
@@ -1753,24 +1749,31 @@ void JhonnyMain::playCore()
 				pTargetMainWindow->GetClientRect(&rectParent);
 				pTargetMainWindow->ClientToScreen(&rectParent);
 				
+				
+				
 				POINT handlePt;
 				handlePt.x = rectRT.left + ((EventTouch*)actions.at(i))->x - rectParent.left;
-				handlePt.y = rectRT.top + ((EventTouch*)actions.at(i))->y - rectParent.top;	
+				handlePt.y = rectRT.top + ((EventTouch*)actions.at(i))->y - rectParent.top + outCoord;	
 
-				CWnd* pWndMainTmp = pTargetMainWindow;
+				//CWnd* pWndMainTmp = pTargetMainWindow;
 				
-				HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+				HWND hTempHandle = ::ChildWindowFromPointEx(pTargetMainWindow->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
 				HWND hTargetHandle = hTempHandle;
 				
+				
+				POINT p = {0};
+				CWnd* pWndTarget;
 				while(hTempHandle != NULL)
 				{
 					CRect r;
 					CWnd* pWndChildTmp = CWnd::FromHandle(hTempHandle);
 
-					pWndChildTmp->GetWindowRect( r ); 
-					pWndMainTmp->ScreenToClient( r ); 
-					handlePt.x = handlePt.x - r.left;
-					handlePt.y = handlePt.y - r.top;
+					
+					::MapWindowPoints(pWndChildTmp->GetSafeHwnd(), pTargetMainWindow->GetSafeHwnd(), &p, 1);
+
+					
+					handlePt.x = handlePt.x - p.x;
+					handlePt.y = handlePt.y - p.y;
 					
 					hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
 			
@@ -1778,48 +1781,28 @@ void JhonnyMain::playCore()
 						break;
 
 					hTargetHandle = hTempHandle;
+					pWndTarget = CWnd::FromHandle (hTargetHandle);
 				}
-
-				core->setTargetWindow(hTargetHandle);
-				/*
-				RECT WndTargetRT, WndMainRT;
-				CWnd* pWndTarget = CWnd::FromHandle (targetHandle);
-				CWnd* pWndMain = pWndTarget;
-				while(pWndMain->GetParent() != NULL)
-					pWndMain = pWndMain->GetParent();
-
-				pWndTarget->GetWindowRect(&WndTargetRT);
-				pWndMain->GetWindowRect(&WndMainRT);
-				POINT targetDistance={0};
-				targetDistance.x = WndTargetRT.left - WndMainRT.left;
-				targetDistance.y = WndTargetRT.top - WndMainRT.top;
-
-				POINT winDistance={0};
-				rectDlg->GetWindowRect(&rectDlgRect);
-				winDistance.x = WndMainRT.left - rectDlgRect.left;
-				winDistance.y = WndMainRT.top - rectDlgRect.top;
-
-				POINT transCoord;
-				transCoord.x = targetDistance.x - winDistance.x;
-				transCoord.y = targetDistance.y - winDistance.y;
-
 				
-				transCoord.x = rectDlgRect.left - WndTargetRT.left;
-				transCoord.y = rectDlgRect.top - WndTargetRT.top;
-				*/
-				RECT WndTargetRT;
+				
+				core->setTargetWindow(hTargetHandle);
+				RECT targetRT = {0,};
 				POINT transCoord;
-
-				CWnd* pWndTarget = CWnd::FromHandle (hTargetHandle);
-				pWndTarget->GetWindowRect(&WndTargetRT);
+				pWndTarget->GetClientRect(&targetRT);
+				pWndTarget->ClientToScreen(&targetRT);
+				
+				
 				rectDlg->GetClientRect(&rectDlgRect);
 				rectDlg->ClientToScreen(&rectDlgRect);
 
-				transCoord.x = rectDlgRect.left - WndTargetRT.left;
-				transCoord.y = rectDlgRect.top - WndTargetRT.top;
+				transCoord.x = rectDlgRect.left - targetRT.left;
+				transCoord.y = rectDlgRect.top - targetRT.top + outCoord;
 					
 
 				core->setTransCoord(transCoord);
+				
+				
+
 			}
 			break;
 		case ID_GOTO:
@@ -4508,10 +4491,16 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 	case SC_MINIMIZE:
 		if(pTargetMainWindow != NULL)
 		{
-			int screenY = (int)GetSystemMetrics(SM_CYSCREEN);
+			//int screenY = (int)GetSystemMetrics(SM_CYSCREEN);
 			pTargetMainWindow->ShowWindow(SW_RESTORE);
 			pTargetMainWindow->GetWindowRect(&returnTargetWindowRect); 
-			pTargetMainWindow->SetWindowPos(NULL, 0, screenY, 0, 0, SWP_NOSIZE);
+			pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
+
+			/*
+			rectDlg->ShowWindow(SW_RESTORE);
+			rectDlg->GetWindowRect(&returnRectWindowRect); 
+			rectDlg->SetWindowPos(NULL, returnRectWindowRect.left, returnRectWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
+			*/
 		}
 		isMainWindowMinimized = true;
 		break;
@@ -4522,6 +4511,12 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 			{
 				pTargetMainWindow->ShowWindow(SW_RESTORE);
 				pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top, 0, 0, SWP_NOSIZE);
+
+				/*
+				rectDlg->ShowWindow(SW_RESTORE);
+				rectDlg->SetWindowPos(NULL, returnRectWindowRect.left, returnRectWindowRect.top, 0, 0, SWP_NOSIZE);
+				*/
+
 			}
 			
 			//AfxMessageBox(_T("re"));
