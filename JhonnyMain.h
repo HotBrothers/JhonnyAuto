@@ -5,6 +5,33 @@
 #include "JhonnyAutoCore.h"
 #include "JhonnyRectDlg.h"
 #include "JhonnyLoadingDlg.h"
+
+
+#include "JhonnyAuto.h"
+#include "JhonnyRunItem.h"
+#include "JhonnyRegister.h"
+#include "JhonnyAbout.h"
+
+#include "zip.h"
+#include "unzip.h"
+
+#include "EventSend.h"
+#include "EventAction.h"
+#include "EventDlgLoop.h"
+#include "EventDlgWait.h"
+#include "EventDlgTouch.h"
+#include "EventDlgPressKey.h"
+#include "EventDlgSeparator.h"
+#include "EventDlgMove.h"
+
+
+#include <wininet.h>
+#include <fstream>  
+#include <iostream>  
+#include <string>  
+#include <io.h>
+
+
 #include "resource.h"
 #include <vector>
 
@@ -79,11 +106,13 @@ public:
 	RECT targetWindowRect;
 	RECT targetMainWindowRect;
 	RECT rectDlgRect;
+	//POINT transCoord;
 
 	RECT returnRectWindowRect;
 	RECT returnTargetWindowRect;
 	bool isMainWindowMinimized;
-
+	HWND getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY);
+	RECT getDlgRectRect();
 
 	
 	void setUserID(CString _userID){userID = _userID;}

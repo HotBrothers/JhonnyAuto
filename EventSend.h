@@ -9,7 +9,8 @@ enum MOUSE_MACRO_EVNT
 	MOUSE_DCLICK,		//	왼쪽 더블 클릭
 	MOUSE_CTRCLICK,		//	컨트롤 왼쪽 클릭
 	MOUSE_SHTCLICK,		//	시프트 왼쪽 클릭
-	MOUSE_DRAG			//	드래그
+	MOUSE_LDRAG,		//	드래그
+	MOUSE_RDRAG
 };
 
 enum KEYBD_MACRO_EVNT
@@ -28,4 +29,5 @@ class EventSend
 public:
 	static BOOL SendMouseEvent(HWND hWnd, WORD posX1, WORD posY1, MOUSE_MACRO_EVNT evnt, WORD posX2 = 0, WORD posY2 = 0);
 	static BOOL SendKeybdEvent(HWND hWnd, DWORD dwKeyValue, KEYBD_MACRO_EVNT evnt);
+	static void wait(DWORD dwMillisecond);
 };

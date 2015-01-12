@@ -66,9 +66,10 @@ BOOL CropImageDlg::OnInitDialog()
 	//CBitmap lamp_image;
 	
 	//SaveToFile(&hBit);
-
+	RECT rect = ((JhonnyMain*)AfxGetMainWnd())->getDlgRectRect();
+	HWND targetMainWnd = ((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd(); 
 	
-	jCore->captureScreen(&hBit, FALSE);
+	jCore->captureScreen(targetMainWnd, rect, &hBit);
 	//lamp_image.Attach(hBit);
 
 

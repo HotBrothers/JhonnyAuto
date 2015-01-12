@@ -59,8 +59,11 @@ BOOL InputMouse::OnInitDialog()
 	CStatic *p_lamp_image = (CStatic *)GetDlgItem(IDC_STATIC_INPUT);
 	CBitmap lamp_image;
 	
-	
-	jCore->captureScreen(&hBit, FALSE);
+	RECT rect = {0,};
+
+	HWND targetMainWnd = ((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd(); 
+	//((JhonnyMain*)AfxGetMainWnd())->rectDlg->GetClientRect(&rect);
+	jCore->captureScreen(targetMainWnd, rect, &hBit);
 	//lamp_image.Attach(hBit);
 
 

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "EventAction.h"
-//#include "JhonnyAutoCore.h"
 #include "JhonnyMain.h"
 
+
 // 공용 
-int EventAction::doAction(JhonnyAutoCore* core)
+int EventAction::doAction(void* ss)
 {
 	OutputDebugString(_T("parent call\n"));
 	return 0;
@@ -53,23 +53,28 @@ TCHAR* EventAction::generateItemID()
 }
 
 // 이미지 터치
-int EventImageTouch::doAction(JhonnyAutoCore* core)
+int EventImageTouch::doAction(void* _main)
 {
+	JhonnyMain* main = (JhonnyMain*)_main;
 	int x = 0;
 	int y = 0;
-
 	eventLog.Format(_T("[이미지터치] : %s, "), name);
-	if(core->doMatching(item, ifItems, name, &x, &y, &eventLog) == 0)
+	if(main->core->doMatching(main->pTargetMainWindow->GetSafeHwnd(), main->getDlgRectRect(), item, ifItems, name, &x, &y, &eventLog) == 0)
 	{
-		int tx = core->transCoord.x + x;
-		int ty = core->transCoord.y + y;
+		int tx = 0; //= main->transCoord.x + x;
+		int ty = 0; //= main->transCoord.y + y;
 
+		/*
 		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
 			eventLog.Format(_T("실패-범위초과[이미지터치] : %s, (%d,%d)"), name, tx, ty);
 			return 0;
 		}
+		*/
 		
+		EventSend::SendMouseEvent(main->targetWindow, tx, ty, MOUSE_LCLICK);
+
+		/*
 		SetCursorPos(tx, ty);
 		mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, ::GetMessageExtraInfo());
 		mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, ::GetMessageExtraInfo());
@@ -77,6 +82,7 @@ int EventImageTouch::doAction(JhonnyAutoCore* core)
 		mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, ::GetMessageExtraInfo());
 		mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, ::GetMessageExtraInfo());
 		mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, ::GetMessageExtraInfo());
+		*/
 	}
 	return 0;
 }
@@ -87,22 +93,25 @@ int EventImageTouch::doReset()
 }
 
 // 이미지 찾기
-int EventImageWait::doAction(JhonnyAutoCore* core)
+int EventImageWait::doAction(void* _main)
 {
 	int x = 0;
 	int y = 0;
 	CString log;
-
+	JhonnyMain* main = (JhonnyMain*)_main;
 	eventLog.Format(_T("[이미지찾기] : %s, "), name);
-	if(core->doMatching(item, ifItems, name, &x, &y, &eventLog) == 0)
+	if(main->core->doMatching(main->pTargetMainWindow->GetSafeHwnd(), main->getDlgRectRect(), item, ifItems, name, &x, &y, &eventLog) == 0)
 	{
-		int tx = core->transCoord.x + x;
-		int ty = core->transCoord.y + y;
+		
+		int tx = 0; //= main->transCoord.x + x;
+		int ty = 0; //= main->transCoord.y + y;
+		/*
 		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
 			eventLog.Format(_T("실패-범위초과[이미지찾기] : %s, (%d,%d)"), name, tx, ty);
 			return 0;
 		}
+		*/
 		SetCursorPos(tx, ty);
 		return findGotoIndex;
 	}
@@ -116,7 +125,7 @@ int EventImageWait::doReset()
 }
 
 // 반복하기
-int EventLoop::doAction(JhonnyAutoCore* core)
+int EventLoop::doAction(void* _main)
 {
 	if(nowLoop > 0 )
 	{
@@ -140,7 +149,7 @@ int EventLoop::doReset()
 }
 
 // 기다리기
-int EventWait::doAction(JhonnyAutoCore* core)
+int EventWait::doAction(void* _main)
 {
 	eventLog.Format(_T("[대기] : %d초 대기"), (int)(millisec/1000));
 	Sleep(millisec);
@@ -153,9 +162,9 @@ int EventWait::doReset()
 }
 
 // 터치하기
-int EventTouch::doAction(JhonnyAutoCore* core)
+int EventTouch::doAction(void* _main)
 {
-	
+	JhonnyMain* main = (JhonnyMain*)_main;
 	CPoint point;
 	//GetCursorPos(&point);
 	if(!isAbsolute)
@@ -170,11 +179,18 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 	}
 	
 	// 터치좌표
-	int tx = point.x + x + core->transCoord.x;		
-	int ty = point.y + y + core->transCoord.y;
-	int dx = point.x + x + core->transCoord.x;
-	int dy = point.y + y + core->transCoord.y;
+	int tx = point.x + x;		
+	int ty = point.y + y;
+	int dx = point.x + dragX;
+	int dy = point.y + dragY;
 
+	int actionTransCoordX, actionTransCoordY;
+	HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+
+	tx += actionTransCoordX;
+	ty += actionTransCoordY;
+	dx += actionTransCoordX;
+	dy += actionTransCoordY;
 	/*
 	if (isAbsolute)
 	{
@@ -184,12 +200,13 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 		dy += core->search->y;
 	}
 	*/
-
+	/*
 	if(isDrag)
 	{
 		dx += dragX;
 		dy += dragY;
 	}
+	*/
 
 	/*
 	if(tx < 0 || ty < 0 || tx > SEARCH_RECT_WIDTH || ty > SEARCH_RECT_HEGIHT ||
@@ -206,117 +223,19 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 	{
 		eventLog.Format(_T("[드래그] : %s, (%d,%d)->(%d,%d)"), name, tx, ty, dx, dy);
 
-		int bx, by;
-		int ax, ay;
-
-		bx = tx;
-		by = ty;
-		ax = dx;
-		ay = dy;
-
-		if(bx == ax)
-			ax+=1;
-		if(by == ay)
-			ay+=1;
+		
 
 		if(isRightClick == false)
-		{
-			SetCursorPos(tx, ty);
-			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, ::GetMessageExtraInfo());
-			wait(300);
-
-			//직선의 방정식
-			double a = double (ay - by) / (ax - bx);
-			double b = by - a*bx;
-			
-			int x_pos = bx;
-			int y_pos = by;
-
-			
-			bool isWide = abs(ax-bx) >= abs(ay-by) ? true : false;
-			if(isWide)
-			{
-				int sign = (ax < bx) ? -1 : 1;
-				for(int i = 0; i < std::abs(ax-bx); i++)
-				{
-					wait(4);
-					x_pos = int(bx + sign*i);
-					y_pos = int(a*(bx + sign*i) + b);
-					SetCursorPos(x_pos, y_pos);
-				}
-			}
-			else
-			{
-				int sign = (ay < by) ? -1 : 1;
-				for(int i = 0; i < std::abs(ay-by); i++)
-				{
-					wait(4);
-					y_pos = int(by + sign*i);
-					x_pos = int(((by + sign*i) - b) / a);
-					SetCursorPos(x_pos, y_pos);
-				}
-			}
-			
-			SetCursorPos(dx, dy);
-			wait(300);
-			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, ::GetMessageExtraInfo());
-
-			
-			
-		}
+			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LDRAG, dx, dy);
 		else
-		{
-			
-			SetCursorPos(bx, by);
-			mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, ::GetMessageExtraInfo());
-			wait(300);
-			//직선의 방정식
-			double a = double (ay - by) / (ax - bx);
-			double b = by - a*bx;
-
-			
-			int x_pos = bx;
-			int y_pos = by;
-
-			bool isWide = abs(ax-bx) >= abs(ay-by) ? true : false;
-			if(isWide)
-			{
-				int sign = (ax < bx) ? -1 : 1;
-				for(int i = 0; i < std::abs(ax-bx); i++)
-				{
-					wait(4);
-					x_pos = int(bx + sign*i);
-					y_pos = int(a*(bx + sign*i) + b);
-					SetCursorPos(x_pos, y_pos);
-				}
-			}
-			else
-			{
-				int sign = (ay < by) ? -1 : 1;
-				for(int i = 0; i < std::abs(ay-by); i++)
-				{
-					wait(4);
-					y_pos = int(by + sign*i);
-					x_pos = int(((by + sign*i) - b) / a);
-					SetCursorPos(x_pos, y_pos);
-				}
-			}
-
-			
-			
-			
-			SetCursorPos(ax, ay);
-			wait(300);
-			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, ::GetMessageExtraInfo());
-			
-		}
+			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_RDRAG, dx, dy);
 	}
 	else
 	{
 		eventLog.Format(_T("[터치] : %s, (%d,%d)"), name, tx, ty);
 		if(isRightClick == false)
 		{
-			EventSend::SendMouseEvent(core->targetWindow, tx, ty, MOUSE_LCLICK);
+			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LCLICK);
 			/*
 			SetCursorPos(tx, ty);
 			SetCursorPos(tx, ty);
@@ -330,6 +249,8 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 		}
 		else
 		{
+			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_RCLICK);
+			/*
 			SetCursorPos(tx, ty);
 			SetCursorPos(tx, ty);
 			mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, ::GetMessageExtraInfo());
@@ -338,6 +259,7 @@ int EventTouch::doAction(JhonnyAutoCore* core)
 			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, ::GetMessageExtraInfo());
 			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, ::GetMessageExtraInfo());
 			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, ::GetMessageExtraInfo());
+			*/
 		}
 	}
 
@@ -355,7 +277,7 @@ int EventTouch::doReset()
 }
 
 // 키누르기
-int EventPressKey::doAction(JhonnyAutoCore* core)
+int EventPressKey::doAction(void* _main)
 {
 	eventLog.Format(_T("[키] : 키를 누릅니다."));
 	if((mod & HOTKEYF_ALT) != 0 )
@@ -396,7 +318,7 @@ int EventPressKey::doReset()
 }
 
 // 구분선
-int EventSeparator::doAction(JhonnyAutoCore* core)
+int EventSeparator::doAction(void* _main)
 {
 	eventLog.Format(_T("------------ %s"), name);
 	return 0;
@@ -408,7 +330,7 @@ int EventSeparator::doReset()
 }
 
 // 이동하기
-int EventGoto::doAction(JhonnyAutoCore* core)
+int EventGoto::doAction(void* _main)
 {
 	eventLog.Format(_T("[이동] : %d번 이동"), goToIndex);
 	return goToIndex;
@@ -420,7 +342,7 @@ int EventGoto::doReset()
 }
 
 // 돌아가기
-int EventReturn::doAction(JhonnyAutoCore* core)
+int EventReturn::doAction(void* _main)
 {
 	eventLog.Format(_T("[복귀] : %d번으로 복귀"), *returnIndex + 1 );
 	if( *returnIndex == 0)

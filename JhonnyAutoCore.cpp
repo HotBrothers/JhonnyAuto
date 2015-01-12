@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "JhonnyMain.h"
 #include "JhonnyAutoCore.h"
 
 #define TIMER_ID 4001
@@ -14,22 +13,22 @@ JhonnyAutoCore::JhonnyAutoCore()
 	threshold = 0.85;
 }
 
-JhonnyAutoCore::JhonnyAutoCore( double _threshold)
+JhonnyAutoCore::JhonnyAutoCore(double _threshold)
 {
 	isPlaying = false;
 	threshold = _threshold;
 }
 
 
-int JhonnyAutoCore::doMatching(JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine)
+int JhonnyAutoCore::doMatching(HWND hTargetWnd, RECT rect, JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine)
 {
 	HBITMAP hBit = NULL;
 	IplImage* dest;
 	CString result;
 
-	captureScreen(&hBit, FALSE);
+	
 
-	if(hBit == NULL )
+	if(captureScreen(hTargetWnd, rect, &hBit) == false || hBit == NULL)
 	{
 		strLine->Format(_T("이미지(NULL) 에러"));
 		DeleteObject(hBit);
@@ -213,26 +212,13 @@ BOOL SaveToFile(HBITMAP hBitmap, LPCTSTR lpszFileName)
 	return TRUE;
 }
 
-
-bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, BOOL isFullScreen)
+/*
+bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 {
 	// 있어도 되나
 	//if(hBitmap != NULL)
 	//	DeleteObject(*hBitmap);
 
-	int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-	int startX = 0;
-	int startY = 0;
-
-	/*
-	if(isFullScreen==FALSE && rectDlgPt != NULL)
-	{
-		startX = rectDlgPt->x;
-		startY = rectDlgPt->y;
-	}
-
-	*/
 
 
 	HDC h_screen_dc = ::GetDC(NULL);
@@ -244,12 +230,12 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, BOOL isFullScreen)
 	// DIB의 형식을 정의한다.
 	BITMAPINFO dib_define;
 	dib_define.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	dib_define.bmiHeader.biWidth = SEARCH_RECT_WIDTH;
-	dib_define.bmiHeader.biHeight = SEARCH_RECT_HEGIHT;
+	dib_define.bmiHeader.biWidth = rect.right - rect.left;
+	dib_define.bmiHeader.biHeight = rect.bottom - rect.top;
 	dib_define.bmiHeader.biPlanes = 1;
 	dib_define.bmiHeader.biBitCount = 24;
 	dib_define.bmiHeader.biCompression = BI_RGB;
-	dib_define.bmiHeader.biSizeImage = (((SEARCH_RECT_WIDTH * 24 + 31) & ~31) >> 3) * SEARCH_RECT_HEGIHT;
+	dib_define.bmiHeader.biSizeImage = ((((rect.right - rect.left) * 24 + 31) & ~31) >> 3) * (rect.bottom - rect.top);
 	dib_define.bmiHeader.biXPelsPerMeter = 0;
 	dib_define.bmiHeader.biYPelsPerMeter = 0;
 	dib_define.bmiHeader.biClrImportant = 0;
@@ -271,10 +257,9 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, BOOL isFullScreen)
 	// 현재 스크린 화면을 캡쳐한다.
 	//::BitBlt(h_memory_dc, 0, 0, width, height, h_screen_dc, 0, 0, SRCCOPY);
 
-	if(isFullScreen == TRUE)
-		::BitBlt(h_memory_dc, startX, startY, ScreenWidth, ScreenHeight, h_screen_dc, 0, 0, SRCCOPY);
-	else
-		::BitBlt(h_memory_dc, -startX, -startY, SEARCH_RECT_WIDTH+startX, SEARCH_RECT_HEGIHT+startY, h_screen_dc, 0, 0, SRCCOPY);
+
+	::BitBlt(h_memory_dc, rect.left, rect.top, (rect.right - rect.left), (rect.bottom - rect.top), h_screen_dc, 0, 0, SRCCOPY);
+
 
 	// 본래의 비트맵으로 복구한다.
 	::SelectObject(h_memory_dc, h_old_bitmap);
@@ -292,31 +277,45 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, BOOL isFullScreen)
 
 	return true;
 
-	/*
-	HDC hScrDC, hMemDC;
+}
+*/
 
-	hScrDC=CreateDC(_T("DISPLAY"),NULL,NULL,NULL);
+bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap)
+{
+    CRect rct;
+    if(hTargetWnd)
+        ::GetWindowRect(hTargetWnd, &rct);
+    else
+        return FALSE;
 
+    HBITMAP hBitmap = NULL;
+    HBITMAP hOldBitmap = NULL;
+    BOOL bSuccess = FALSE;
 
-	hMemDC = CreateCompatibleDC(hScrDC);
-	if(isFullScreen == TRUE)
-		*bitmap = CreateCompatibleBitmap(hScrDC, ScreenWidth, ScreenHeight);
-	else 
-		*bitmap = CreateCompatibleBitmap(hScrDC, SEARCH_RECT_WIDTH, SEARCH_RECT_HEGIHT);
-	SelectObject(hMemDC, *bitmap);
+    HDC hDC = ::GetDC(hTargetWnd);
+    HDC hMemDC = ::CreateCompatibleDC(hDC);
+    hBitmap = ::CreateCompatibleBitmap(hDC, rct.Width(), rct.Height());
 
-	//BitBlt(hMemDC, startX, startY, SEARCH_RECT_WIDTH, SEARCH_RECT_HEGIHT, hScrDC, 0, 0, SRCCOPY);
-	
-	if(isFullScreen == TRUE)
-		BitBlt(hMemDC, startX, startY, ScreenWidth, ScreenHeight, hScrDC, 0, 0, SRCCOPY);
-	else
-		BitBlt(hMemDC, -startX, -startY, SEARCH_RECT_WIDTH+startX, SEARCH_RECT_HEGIHT+startY, hScrDC, 0, 0, SRCCOPY);
-		
-	//SaveToFile(*bitmap, "save.bmp");
-	DeleteDC(hMemDC);
-	DeleteDC(hScrDC);
-	//InvalidateRect(hWnd, NULL, TRUE);
-	*/
+    if(!hBitmap)
+        return FALSE;
+
+    hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
+
+    if(!::PrintWindow(hTargetWnd, hMemDC, PW_CLIENTONLY))
+        bSuccess = FALSE;
+    else
+        bSuccess = TRUE;
+
+	::BitBlt(hMemDC, rect.left, rect.top, (rect.right - rect.left), (rect.bottom - rect.top), hDC, 0, 0, SRCCOPY);
+
+	*returnBitmap = hBitmap;
+
+    SelectObject(hMemDC, hOldBitmap);
+    //DeleteObject(hBitmap);
+    ::DeleteDC(hMemDC);
+    ::ReleaseDC(hTargetWnd, hDC);
+
+    return bSuccess;
 }
 
 bool JhonnyAutoCore::hBitmap2Ipl(HBITMAP* hBmp, IplImage** pIplImage)

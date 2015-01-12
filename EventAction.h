@@ -24,7 +24,7 @@ public:
 	CString eventLog;
 
 
-	virtual int doAction(JhonnyAutoCore* core);
+	virtual int doAction(void* );
 	virtual int doReset();
 	virtual int getEventID();
 	virtual TCHAR* getID();
@@ -53,7 +53,7 @@ public:
 	
 	const int eventID;
 	TCHAR id[10];
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -96,7 +96,7 @@ public:
 
 	const int eventID;
 	TCHAR id[10];
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -125,7 +125,7 @@ public:
 		{ loopCount = _loopCount; goToIndex = _goToIndex; StrCpyW(id, generateItemID()); nowLoop = _loopCount;  StrCpyW(gotoID, _T(""));}
 	EventLoop(int _loopCount, int _goToIndex, TCHAR* _gotoID) : eventID(ID_LOOP) 
 		{ loopCount = _loopCount; goToIndex = _goToIndex; StrCpyW(id, generateItemID()); nowLoop = _loopCount;  StrCpyW(gotoID, _gotoID);}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* main);
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -147,7 +147,7 @@ public:
 	TCHAR id[10];
 	EventWait(): eventID(ID_WAIT){}
 	EventWait(int _millisec) : eventID(ID_WAIT) { millisec = _millisec; StrCpyW(id, generateItemID());}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -173,7 +173,7 @@ public:
 			{ StrCpyW(name, _name); x = _x; y = _y;  isAbsolute = _isAbsolute; isRightClick = _isRightClick; StrCpyW(id, generateItemID());  isDrag = false;}*/
 	EventTouch(TCHAR* _name, int _x, int _y, int _dragX, int _dragY, BOOL _isAbsolute, BOOL _isDrag, BOOL _isRightClick ) : eventID(ID_TOUCH) 
 			{ StrCpyW(name, _name); x = _x; y = _y;  dragX = _dragX; dragY = _dragY; isAbsolute = _isAbsolute; isDrag = _isDrag; isRightClick = _isRightClick; StrCpyW(id, generateItemID()); }
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -201,7 +201,7 @@ public:
 	EventPressKey(): eventID(ID_PRESS_KEY){}
 	EventPressKey(WORD _vk, int _mod) : eventID(ID_PRESS_KEY) 
 			{ vk = _vk; mod = _mod; StrCpyW(id, generateItemID());}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -223,7 +223,7 @@ public:
 	EventSeparator(): eventID(ID_SEPARATOR){}
 	EventSeparator(TCHAR* _name) : eventID(ID_SEPARATOR) 
 			{StrCpyW(name, _name); StrCpyW(id, generateItemID());}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -245,7 +245,7 @@ public:
 			{goToIndex = _goToIndex; StrCpyW(id, generateItemID()); StrCpyW(gotoID, _T(""));}
 	EventGoto(int _goToIndex, TCHAR* _gotoID) : eventID(ID_GOTO) 
 			{goToIndex = _goToIndex; StrCpyW(id, generateItemID()); StrCpyW(gotoID, _gotoID);}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}
@@ -267,7 +267,7 @@ public:
 			{returnIndex = _returnIndex; StrCpyW(id, generateItemID()); StrCpyW(returnID, _T(""));}
 	EventReturn(int* _returnIndex, TCHAR* _returnID) : eventID(ID_RETURN) 
 			{returnIndex = _returnIndex; StrCpyW(id, generateItemID()); StrCpyW(returnID, _returnID);}
-	int doAction(JhonnyAutoCore* core);
+	int doAction(void* );
 	int doReset();
 	int getEventID(){return eventID;}
 	TCHAR* getID(){return id;}

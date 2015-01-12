@@ -4,11 +4,11 @@
 
 #pragma once
 
-
+/*
 #include <afxmt.h>
 #include <windows.h>
 #include <memory>
-
+*/
 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
@@ -17,8 +17,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
-
-#include "JhonnyRunItem.h"
+#include "JhonnyItem.h"
 
 #define AUTO_MAX 100
 
@@ -26,26 +25,24 @@ class JhonnyAutoCore
 {
 public:
 	JhonnyAutoCore();
-	JhonnyAutoCore::JhonnyAutoCore(double _threshold);
+	JhonnyAutoCore(double _threshold);
 	
-
-	
-
 	double threshold;
 	bool isPlaying;
 	POINT transCoord;
 	HWND targetWindow;
 	
-	void setTargetWindow(HWND _targetWindow) { targetWindow = _targetWindow; }
+	//void setTargetWindow(HWND _targetWindow) { targetWindow = _targetWindow; }
 	void setThreshold(float _threshold){ threshold = _threshold;}
 	void setTransCoord(POINT _transCoord){ transCoord = _transCoord;}
-	bool captureScreen(HBITMAP* bitmap, BOOL isFullScreen);
+	
+	bool captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap);
 	bool hBitmap2Ipl(HBITMAP* hBmp, IplImage** pIplImage);
 	bool matching(IplImage* background, IplImage* object, CvPoint* rect ,double* returnScore, double threshold);
 
-	
+	//bool captureScreen(HBITMAP* hBitmap, RECT rect);
 
-	int doMatching(JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine);
+	int doMatching(HWND hTargetWnd, RECT rect, JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine);
 	
 
 private:

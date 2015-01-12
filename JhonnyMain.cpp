@@ -2,34 +2,11 @@
 //
 
 #include "stdafx.h"
-#include "JhonnyAuto.h"
 #include "JhonnyMain.h"
-#include "JhonnyRunItem.h"
-#include "JhonnyRegister.h"
-#include "JhonnyAbout.h"
-#include "JhonnyAutoCore.h"
-
+/*
 #include "afxcmn.h"
 #include "afxdialogex.h"
-
-#include "zip.h"
-#include "unzip.h"
-
-#include "EventSend.h"
-#include "EventAction.h"
-#include "EventDlgLoop.h"
-#include "EventDlgWait.h"
-#include "EventDlgTouch.h"
-#include "EventDlgPressKey.h"
-#include "EventDlgSeparator.h"
-#include "EventDlgMove.h"
-
-
-#include <wininet.h>
-#include <fstream>  
-#include <iostream>  
-#include <string>  
-#include <io.h>
+*/
 
 
 #define MIN_WINDOW_WIDTH 436
@@ -40,299 +17,8 @@
 using namespace std;
 
 BOOL Capture(HWND hTargetWnd, LPCTSTR lpszFilePath);
-
-bool compareObj( EventAction* first, EventAction* second )
-{
- // vector 내에서 앞에 놓이는 녀석은 뒤에 놓이는 녀석보다 다음과 같은 조건을 만족한다
- return first->getSortNum() < second->getSortNum();
- 
- // 만약 vector의 index 0부터 끝까지 getInt()의 값에 따라 오름차순이 되게 하려면
- // return first.getInt() < second.getInt(); 가 되야 할 것이다.
-}
-
-
-
-CString GetFileVersion()
-{
-    CString strVersion = _T("");
-    HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(VS_VERSION_INFO), RT_VERSION);
-    if (hRsrc != NULL)
-    {
-        HGLOBAL hGlobalMemory = LoadResource(NULL, hRsrc);
-        if (hGlobalMemory != NULL)
-        {
-            CString rVersion;
-            LPVOID pVersionResouece = LockResource(hGlobalMemory);
-            LPVOID pVersion = NULL;
-            DWORD uLength,langD;
-            BOOL retVal;
-            retVal = VerQueryValue(pVersionResouece, _T("\\VarFileInfo\\Translation"), (LPVOID*)&pVersion, (UINT*)&uLength);
-            if (retVal && uLength == 4) 
-            {
-                memcpy(&langD,pVersion,4); 
-                rVersion.Format(_T("\\StringFileInfo\\%02X%02X%02X%02X\\FileVersion"),
-                    (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, 
-                    (langD & 0xff0000)>>16);
-            }
-            else
-            {
-                rVersion.Format(_T("\\StringFileInfo\\%04X04B0\\FileVersion"), GetUserDefaultLangID());
-            }
-            if( VerQueryValue(pVersionResouece, rVersion.GetBuffer(0), (LPVOID*)&pVersion, (UINT *)&uLength) != 0 )
-            {
-                strVersion.Format(_T("%s"), pVersion);
-            }
-        }
-        FreeResource(hGlobalMemory);
-    }
-    return strVersion;
-}
-
-
-int JhonnyMain::HttpGetJhonnyVersionBaaS(TCHAR* noticeInput, TCHAR* versionInput)
- {
-	 HINTERNET hInternetRoot = InternetOpen( _T("TestWinINet"),
-                                            INTERNET_OPEN_TYPE_PRECONFIG,
-                                            NULL,
-                                            NULL,
-                                            0);
- 
-    HINTERNET hInternetConnect = InternetConnect(   hInternetRoot,
-                                                    _T("api.baas.io"),
-                                                    INTERNET_DEFAULT_HTTPS_PORT,
-                                                    _T(""),
-                                                    _T(""),
-                                                    INTERNET_SERVICE_HTTP,
-                                                    0,
-                                                    0);
- 
-    HINTERNET hOpenRequest = HttpOpenRequest(   hInternetConnect,
-                                                _T("GET"),
-                                                _T("/14c45929-47a7-11e4-9866-06f4fe0000b5/1dd8c207-47a8-11e4-9866-06f4fe0000b5/menifests/243b3c47-6dfe-11e4-9e22-06a6fa0000b9/"),
-                                                HTTP_VERSION,
-                                                _T(""),
-                                                NULL,
-                                                INTERNET_FLAG_SECURE|INTERNET_FLAG_IGNORE_CERT_CN_INVALID|INTERNET_FLAG_IGNORE_CERT_DATE_INVALID,
-                                                0);
- 
-	
-	
-
-
-    BOOL bSendRequest = HttpSendRequestA(hOpenRequest,
-                                        NULL,
-                                        0,
-                                        NULL, 0);
-	char returnData[2048]={0,};
-	DWORD dwSize = 0;
-    BOOL bRead = InternetReadFile(  hOpenRequest,
-                                    returnData,
-                                    2048,
-                                    &dwSize);
-
-	TCHAR szUniCode[2048]={0,};
-
-
-	int nLen = MultiByteToWideChar(CP_UTF8, 0, returnData, strlen(returnData), NULL, NULL);
-	MultiByteToWideChar(CP_UTF8, 0, returnData, strlen(returnData), szUniCode, 2048);
-
-	CString version = szUniCode;
-	CString tokenizerVersion = _T("\"version\" : ");
-	int idx = version.Find(tokenizerVersion);
-	version = version.Mid(idx + tokenizerVersion.GetLength() + 1);
-	idx = version.Find(_T("\""));
-	version = version.Left(idx);
-	StrCpyW(versionInput, version);
-	OutputDebugString(version);
-	OutputDebugString(_T("\n"));
-
-
-	CString notice = szUniCode;
-	CString tokenizerNotice = _T("\"notice\" : ");
-	idx = notice.Find(tokenizerNotice);
-	notice = notice.Mid(idx + tokenizerNotice.GetLength() + 1);
-	idx = notice.Find(_T("\""));
-	notice = notice.Left(idx);
-	notice.Replace( _T("\\n"), _T("\n") );
-	StrCpyW(noticeInput, notice);
-	OutputDebugString(notice);
-	OutputDebugString(_T("\n"));
-
-	
-
-
-	BOOL bRet = InternetCloseHandle(hOpenRequest);
-	bRet = InternetCloseHandle(hInternetConnect);
-	bRet = InternetCloseHandle(hInternetRoot);
-	CString clientVersion = GetFileVersion();
-	OutputDebugString(clientVersion);
-	OutputDebugString(_T("\n"));
-	if ( version.Compare(clientVersion) == 0 ) 
-	{
-		OutputDebugString( _T("최신버전 입니다.\n"));
-		return 0;
-	}
-	else
-	{
-		OutputDebugString( _T("구버전 입니다.\n"));
-		return -1;
-	}
-
-
-	return 0;
- }
-
-
-
-
-
-CString JhonnyMain::HttpPostUserTokenBaaS(char* returnData, int length, CString id, CString pass, bool* activated)
- {
-	 HINTERNET hInternetRoot = InternetOpen( _T("TestWinINet"),
-                                            INTERNET_OPEN_TYPE_PRECONFIG,
-                                            NULL,
-                                            NULL,
-                                            0);
- 
-    HINTERNET hInternetConnect = InternetConnect(   hInternetRoot,
-                                                    _T("api.baas.io"),
-                                                    INTERNET_DEFAULT_HTTPS_PORT,
-                                                    _T(""),
-                                                    _T(""),
-                                                    INTERNET_SERVICE_HTTP,
-                                                    0,
-                                                    0);
- 
-    HINTERNET hOpenRequest = HttpOpenRequest(   hInternetConnect,
-                                                _T("POST"),
-                                                _T("/14c45929-47a7-11e4-9866-06f4fe0000b5/1dd8c207-47a8-11e4-9866-06f4fe0000b5/token"),
-                                                HTTP_VERSION,
-                                                _T(""),
-                                                NULL,
-                                                INTERNET_FLAG_SECURE|INTERNET_FLAG_IGNORE_CERT_CN_INVALID|INTERNET_FLAG_IGNORE_CERT_DATE_INVALID,
-                                                0);
- 
-	
-	
-    TCHAR szPostData[2048] = {0};
-	wsprintf(szPostData, _T("grant_type=password&username=%s&password=%s"), id, pass);
-    //lstrcpy(szPostData, "grant_type=password&username=jhonny&password=jhonny");
- 
-    // post header
-    TCHAR szLen[MAX_PATH] = {0};
-    TCHAR szHeader[2048] = {0};
-
-
- 
-    wsprintf(szLen, _T("%d"), lstrlen(szPostData));
-    lstrcpy(szHeader, _T("Accept: text/*\r\n"));
-    lstrcat(szHeader, _T("User-Agent: Mozilla/4.0 (compatible; MSIE 5.0;* Windows NT)\r\n"));
-    lstrcat(szHeader, _T("Content-type: application/x-www-form-urlencoded\r\n"));
-    lstrcat(szHeader, _T("Content-length: "));
-    lstrcat(szHeader, szLen);
-    lstrcat(szHeader, _T("\r\n\n"));
-	
- 
-	int dwLength = _tcslen(szHeader) + 1; 
-	char *lpFormData = new char[dwLength]; 
-	WideCharToMultiByte(CP_ACP, 0, szHeader, dwLength, lpFormData, dwLength, NULL, NULL);
-	HttpAddRequestHeadersA(hOpenRequest, lpFormData, -1L, HTTP_ADDREQ_FLAG_ADD);
-	delete [] lpFormData; 
-
-
-	dwLength = _tcslen(szPostData) + 1; 
-	lpFormData = new char[dwLength]; 
-	WideCharToMultiByte(CP_ACP, 0, szPostData, dwLength, lpFormData, dwLength, NULL, NULL);
-    BOOL bSendRequest = HttpSendRequestA(hOpenRequest,
-                                        NULL,
-                                        0,
-                                        lpFormData,
-                                        strlen(lpFormData));
-	delete [] lpFormData; 
-
-	char data[2048]={0,};
-	DWORD dwSize = 0;
-    BOOL bRead = InternetReadFile(  hOpenRequest,
-                                    data,
-                                    2048,
-                                    &dwSize);
-	CString token;
-	CString access = _T("access_token");
-	CString inactived = _T("user not activated");
-	token = CString( data );
-	
-	int idx = token.Find(inactived);
-	if(activated != NULL)
-	{
-		if(idx == -1)
-			*activated = true;
-		else 
-			*activated = false;
-	}
-	
-
-	idx = token.Find(access);
-	if(idx == -1)
-		return _T("fail");
-
-
-
-	token = token.Mid(idx + access.GetLength()+2);
-	OutputDebugString(token);
-	OutputDebugString(_T("\n"));
-	idx = token.Find(_T("\""));
-	token = token.Mid(idx+1);
-
-	idx = token.Find(_T(","));
-	token = token.Left(idx-1);
-	
-	OutputDebugString(token);
-	OutputDebugString(_T("\n"));
-
-	BOOL bRet = InternetCloseHandle(hOpenRequest);
-	bRet = InternetCloseHandle(hInternetConnect);
-	bRet = InternetCloseHandle(hInternetRoot);
-	return token;
- }
-
-int JhonnyMain::getFiles(TCHAR* path, TCHAR* extensionType, std::vector<TCHAR*>* fileList)
-{
-	TCHAR  filePathSearch[MAX_PATH]= _T("");
-	HANDLE hSrch;
-	WIN32_FIND_DATA stWinFindData;
-	BOOL   bResult = TRUE;
-	
-	StrCpyW(filePathSearch, path);
-	StrCatW(filePathSearch, extensionType);
-	hSrch = FindFirstFile ( filePathSearch, &stWinFindData );
-	if ( hSrch == INVALID_HANDLE_VALUE )
-		return -1;
-	fileList->clear();
-	
-
-	while ( bResult )
-	{
-		if ( !(stWinFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-		{
-			TCHAR* inputPath = new TCHAR[MAX_PATH];
-			wsprintf ( inputPath, _T("%s\\%s"), path, stWinFindData.cFileName );
-			fileList->push_back(inputPath);
-		}
-		bResult = FindNextFile ( hSrch, &stWinFindData );
-	}
-	FindClose(hSrch);
-	return 0;
-}
-
-std::string JhonnyMain::TCHARToString(const TCHAR* ptsz)
-{
-     int len = wcslen((wchar_t*)ptsz);
-     char* psz = new char[2*len + 1];
-     wcstombs(psz, (wchar_t*)ptsz, 2*len + 1);
-     std::string s = psz;
-     delete [] psz;
-     return s;
-}
+CString GetFileVersion();
+bool compareObj( EventAction* first, EventAction* second );
 
 
 // JhonnyMain dialog
@@ -356,6 +42,7 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	targetWindow = NULL;
 	pTargetMainWindow = NULL;
 	isMainWindowMinimized = false;
+	
 	core = new JhonnyAutoCore(0.85);
 	isplayAndStopEnable = true;
 	StrCpyW(rootPath, _T(""));
@@ -1273,50 +960,8 @@ void JhonnyMain::OnLvnBegindragListPlaylist(NMHDR *pNMHDR, LRESULT *pResult)
 
 void JhonnyMain::playAndStop()
 {
-	/*
-	POINT pt = searchRectPoint;
-	pt.x += SEARCH_RECT_WIDTH / 2.0;
-	pt.y += SEARCH_RECT_HEGIHT / 2.0;
-	
-	targetWindow = ::WindowFromPoint(pt);
-	if(NULL != targetWindow)
-	{
-		pTargetWindow = CWnd::FromHandle (targetWindow);
-		pTargetMainWindow = pTargetWindow;
-		while(pTargetMainWindow->GetParent() != NULL)
-			pTargetMainWindow = pTargetMainWindow->GetParent();
-
-		pTargetWindow->GetWindowRect(&targetWindowRect);
-		pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
-		POINT targetDistance={0};
-		targetDistance.x = targetWindowRect.left - targetMainWindowRect.left;
-		targetDistance.y = targetWindowRect.top - targetMainWindowRect.top;
-
-		POINT winDistance={0};
-		rectDlg->GetWindowRect(&rectDlgRect);
-		winDistance.x = targetMainWindowRect.left - rectDlgRect.left;
-		winDistance.y = targetMainWindowRect.top - rectDlgRect.top;
-
-		transCoord.x = targetDistance.x - winDistance.x;
-		transCoord.y = targetDistance.y - winDistance.y;
-
-		//EventSend::SendMouseEvent(targetWindow, 100,100, MOUSE_LCLICK);
-		
-		
-		CString str, str2, names;
-		pTargetWindow->GetWindowText(str);
-		pTargetMainWindow->GetWindowText(str2);
-		names = str + _T(", ") + str2 + _T(" :  ");
-		WCHAR wszText[50] = {0,};
-		wsprintf(wszText, L"0x%08x, 0x%08x", pTargetWindow->GetSafeHwnd(), pTargetMainWindow->GetSafeHwnd());
-		MessageBox(names);
-		
-		
-	}
-	//rectDlg->isMovable = (rectDlg->isMovable == true) ? false : true;
-	//rectDlg->setMoveable(false);
-	*/
-
+	if(isMainWindowMinimized)
+		return;
 
 	CString strLine;
 	if(listPlaylist.IsWindowEnabled())
@@ -1347,11 +992,12 @@ void JhonnyMain::playAndStop()
 		editLogbox.ReplaceSel(strLine);
 		editLogbox.SetScrollPos(SB_HORZ, 0);
 
-		// 타겟 윈도우 등록 및 터치좌표 계산 
+		
 		POINT pt = searchRectPoint;
 		pt.x += SEARCH_RECT_WIDTH / 2.0;
 		pt.y += SEARCH_RECT_HEGIHT / 2.0;
 	
+		// 타겟 부모 윈도우 구함
 		targetWindow = ::WindowFromPoint(pt);
 		if(NULL != targetWindow)
 		{
@@ -1361,31 +1007,6 @@ void JhonnyMain::playAndStop()
 
 			pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
 
-			/*
-			transCoord.x = targetWindowRect.left - targetMainWindowRect.left;
-			transCoord.y = targetWindowRect.top - targetMainWindowRect.top;
-			*/
-			
-			/*
-			POINT targetDistance={0};
-			targetDistance.x = targetMainWindowRect.left - targetWindowRect.left;
-			targetDistance.y = targetMainWindowRect.top - targetWindowRect.top;
-
-			
-			POINT winDistance={0};
-			rectDlg->GetWindowRect(&rectDlgRect);
-			winDistance.x = targetMainWindowRect.left - rectDlgRect.left;
-			winDistance.y = targetMainWindowRect.top - rectDlgRect.top;
-			
-			transCoord.x = targetDistance.x - winDistance.x;
-			transCoord.y = targetDistance.y - winDistance.y;
-			*/
-			/*
-			rectDlg->GetClientRect(&rectDlgRect);
-			rectDlg->ClientToScreen(&rectDlgRect);
-			transCoord.x = rectDlgRect.left - targetWindowRect.left;
-			transCoord.y = rectDlgRect.top - targetWindowRect.top;
-			*/		
 		}
 		
 		
@@ -1715,7 +1336,69 @@ void JhonnyMain::doPlay()
 			threadHandle = (HANDLE) _beginthreadex(0, 0, (unsigned int (__stdcall *)(void *))threadDoPlay, (JhonnyMain*)AfxGetMainWnd(), 0, (unsigned int *)&threadID);
 	}
 }
+HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY)
+{
+	int outCoord = 0;
+	if(isMainWindowMinimized)
+		outCoord = (int)GetSystemMetrics(SM_CYSCREEN);
 
+
+	RECT rectRT;
+	rectDlg->GetClientRect(&rectRT);
+	rectDlg->ClientToScreen(&rectRT);
+	
+	RECT rectParent;
+	pTargetMainWindow->GetClientRect(&rectParent);
+	pTargetMainWindow->ClientToScreen(&rectParent);
+				
+				
+				
+	POINT handlePt;
+	handlePt.x = rectRT.left + inputX - rectParent.left;
+	handlePt.y = rectRT.top + inputY - rectParent.top + outCoord;	
+
+	//CWnd* pWndMainTmp = pTargetMainWindow;
+				
+		CWnd* pWndMainTmp = pTargetMainWindow;
+				
+	HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+	HWND hTargetHandle = hTempHandle;
+	CWnd* pWndTarget;
+	while(hTempHandle != NULL)
+	{
+		CRect r;
+		CWnd* pWndChildTmp = CWnd::FromHandle(hTempHandle);
+
+		pWndChildTmp->GetWindowRect( r ); 
+		pWndMainTmp->ScreenToClient( r ); 
+		handlePt.x = handlePt.x - r.left;
+		handlePt.y = handlePt.y - r.top;
+					
+		hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+			
+		if(hTargetHandle == hTempHandle || hTempHandle == NULL)
+			break;
+
+		hTargetHandle = hTempHandle;
+					
+	}
+
+	//core->setTargetWindow(hTargetHandle);
+
+	RECT WndTargetRT;
+
+	pWndTarget = CWnd::FromHandle (hTargetHandle);
+	//CWnd* pWndTarget = CWnd::FromHandle (hTargetHandle);
+	pWndTarget->GetWindowRect(&WndTargetRT);
+	rectDlg->GetClientRect(&rectDlgRect);
+	rectDlg->ClientToScreen(&rectDlgRect);
+
+	
+	*transCoordX = rectDlgRect.left - WndTargetRT.left;
+	*transCoordY = rectDlgRect.top - WndTargetRT.top + outCoord;
+	
+	return hTargetHandle;
+}
 
 void JhonnyMain::playCore()
 {
@@ -1724,7 +1407,6 @@ void JhonnyMain::playCore()
 	CString strLine;
 	int i = startIndex;
 	startIndex = 0;
-
 	for(; i<actions.size(); i++)
 	{
 		if(threadExit==true)
@@ -1733,6 +1415,7 @@ void JhonnyMain::playCore()
 		selectItem(&listPlaylist, i);
 		switch (actions.at(i)->getEventID())
 		{
+			/*
 		case ID_IMAGE_TOUCH:
 		case ID_TOUCH:
 			{
@@ -1757,23 +1440,20 @@ void JhonnyMain::playCore()
 
 				//CWnd* pWndMainTmp = pTargetMainWindow;
 				
-				HWND hTempHandle = ::ChildWindowFromPointEx(pTargetMainWindow->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+					CWnd* pWndMainTmp = pTargetMainWindow;
+				
+				HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
 				HWND hTargetHandle = hTempHandle;
-				
-				
-				POINT p = {0};
 				CWnd* pWndTarget;
 				while(hTempHandle != NULL)
 				{
 					CRect r;
 					CWnd* pWndChildTmp = CWnd::FromHandle(hTempHandle);
 
-					
-					::MapWindowPoints(pWndChildTmp->GetSafeHwnd(), pTargetMainWindow->GetSafeHwnd(), &p, 1);
-
-					
-					handlePt.x = handlePt.x - p.x;
-					handlePt.y = handlePt.y - p.y;
+					pWndChildTmp->GetWindowRect( r ); 
+					pWndMainTmp->ScreenToClient( r ); 
+					handlePt.x = handlePt.x - r.left;
+					handlePt.y = handlePt.y - r.top;
 					
 					hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
 			
@@ -1781,22 +1461,23 @@ void JhonnyMain::playCore()
 						break;
 
 					hTargetHandle = hTempHandle;
-					pWndTarget = CWnd::FromHandle (hTargetHandle);
+					
 				}
-				
-				
+
 				core->setTargetWindow(hTargetHandle);
-				RECT targetRT = {0,};
+
+				RECT WndTargetRT;
 				POINT transCoord;
-				pWndTarget->GetClientRect(&targetRT);
-				pWndTarget->ClientToScreen(&targetRT);
-				
-				
+				pWndTarget = CWnd::FromHandle (hTargetHandle);
+				//CWnd* pWndTarget = CWnd::FromHandle (hTargetHandle);
+				pWndTarget->GetWindowRect(&WndTargetRT);
 				rectDlg->GetClientRect(&rectDlgRect);
 				rectDlg->ClientToScreen(&rectDlgRect);
 
-				transCoord.x = rectDlgRect.left - targetRT.left;
-				transCoord.y = rectDlgRect.top - targetRT.top + outCoord;
+		
+
+				transCoord.x = rectDlgRect.left - WndTargetRT.left;
+				transCoord.y = rectDlgRect.top - WndTargetRT.top + outCoord;
 					
 
 				core->setTransCoord(transCoord);
@@ -1805,6 +1486,7 @@ void JhonnyMain::playCore()
 
 			}
 			break;
+			*/
 		case ID_GOTO:
 			returnIndexMain = i+1;
 			break;
@@ -1812,7 +1494,7 @@ void JhonnyMain::playCore()
 			break;
 		}
 			
-		int result = actions.at(i)->doAction(core);
+		int result = actions.at(i)->doAction(this);
 		
 		
 		
@@ -4572,4 +4254,307 @@ BOOL Capture(HWND hTargetWnd, LPCTSTR lpszFilePath)
     ::ReleaseDC(hTargetWnd, hDC);
 
     return bSuccess;
+}
+
+
+
+bool compareObj( EventAction* first, EventAction* second )
+{
+ // vector 내에서 앞에 놓이는 녀석은 뒤에 놓이는 녀석보다 다음과 같은 조건을 만족한다
+ return first->getSortNum() < second->getSortNum();
+ 
+ // 만약 vector의 index 0부터 끝까지 getInt()의 값에 따라 오름차순이 되게 하려면
+ // return first.getInt() < second.getInt(); 가 되야 할 것이다.
+}
+
+
+
+CString GetFileVersion()
+{
+    CString strVersion = _T("");
+    HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(VS_VERSION_INFO), RT_VERSION);
+    if (hRsrc != NULL)
+    {
+        HGLOBAL hGlobalMemory = LoadResource(NULL, hRsrc);
+        if (hGlobalMemory != NULL)
+        {
+            CString rVersion;
+            LPVOID pVersionResouece = LockResource(hGlobalMemory);
+            LPVOID pVersion = NULL;
+            DWORD uLength,langD;
+            BOOL retVal;
+            retVal = VerQueryValue(pVersionResouece, _T("\\VarFileInfo\\Translation"), (LPVOID*)&pVersion, (UINT*)&uLength);
+            if (retVal && uLength == 4) 
+            {
+                memcpy(&langD,pVersion,4); 
+                rVersion.Format(_T("\\StringFileInfo\\%02X%02X%02X%02X\\FileVersion"),
+                    (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, 
+                    (langD & 0xff0000)>>16);
+            }
+            else
+            {
+                rVersion.Format(_T("\\StringFileInfo\\%04X04B0\\FileVersion"), GetUserDefaultLangID());
+            }
+            if( VerQueryValue(pVersionResouece, rVersion.GetBuffer(0), (LPVOID*)&pVersion, (UINT *)&uLength) != 0 )
+            {
+                strVersion.Format(_T("%s"), pVersion);
+            }
+        }
+        FreeResource(hGlobalMemory);
+    }
+    return strVersion;
+}
+
+
+int JhonnyMain::HttpGetJhonnyVersionBaaS(TCHAR* noticeInput, TCHAR* versionInput)
+ {
+	 HINTERNET hInternetRoot = InternetOpen( _T("TestWinINet"),
+                                            INTERNET_OPEN_TYPE_PRECONFIG,
+                                            NULL,
+                                            NULL,
+                                            0);
+ 
+    HINTERNET hInternetConnect = InternetConnect(   hInternetRoot,
+                                                    _T("api.baas.io"),
+                                                    INTERNET_DEFAULT_HTTPS_PORT,
+                                                    _T(""),
+                                                    _T(""),
+                                                    INTERNET_SERVICE_HTTP,
+                                                    0,
+                                                    0);
+ 
+    HINTERNET hOpenRequest = HttpOpenRequest(   hInternetConnect,
+                                                _T("GET"),
+                                                _T("/14c45929-47a7-11e4-9866-06f4fe0000b5/1dd8c207-47a8-11e4-9866-06f4fe0000b5/menifests/243b3c47-6dfe-11e4-9e22-06a6fa0000b9/"),
+                                                HTTP_VERSION,
+                                                _T(""),
+                                                NULL,
+                                                INTERNET_FLAG_SECURE|INTERNET_FLAG_IGNORE_CERT_CN_INVALID|INTERNET_FLAG_IGNORE_CERT_DATE_INVALID,
+                                                0);
+ 
+	
+	
+
+
+    BOOL bSendRequest = HttpSendRequestA(hOpenRequest,
+                                        NULL,
+                                        0,
+                                        NULL, 0);
+	char returnData[2048]={0,};
+	DWORD dwSize = 0;
+    BOOL bRead = InternetReadFile(  hOpenRequest,
+                                    returnData,
+                                    2048,
+                                    &dwSize);
+
+	TCHAR szUniCode[2048]={0,};
+
+
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, returnData, strlen(returnData), NULL, NULL);
+	MultiByteToWideChar(CP_UTF8, 0, returnData, strlen(returnData), szUniCode, 2048);
+
+	CString version = szUniCode;
+	CString tokenizerVersion = _T("\"version\" : ");
+	int idx = version.Find(tokenizerVersion);
+	version = version.Mid(idx + tokenizerVersion.GetLength() + 1);
+	idx = version.Find(_T("\""));
+	version = version.Left(idx);
+	StrCpyW(versionInput, version);
+	OutputDebugString(version);
+	OutputDebugString(_T("\n"));
+
+
+	CString notice = szUniCode;
+	CString tokenizerNotice = _T("\"notice\" : ");
+	idx = notice.Find(tokenizerNotice);
+	notice = notice.Mid(idx + tokenizerNotice.GetLength() + 1);
+	idx = notice.Find(_T("\""));
+	notice = notice.Left(idx);
+	notice.Replace( _T("\\n"), _T("\n") );
+	StrCpyW(noticeInput, notice);
+	OutputDebugString(notice);
+	OutputDebugString(_T("\n"));
+
+	
+
+
+	BOOL bRet = InternetCloseHandle(hOpenRequest);
+	bRet = InternetCloseHandle(hInternetConnect);
+	bRet = InternetCloseHandle(hInternetRoot);
+	CString clientVersion = GetFileVersion();
+	OutputDebugString(clientVersion);
+	OutputDebugString(_T("\n"));
+	if ( version.Compare(clientVersion) == 0 ) 
+	{
+		OutputDebugString( _T("최신버전 입니다.\n"));
+		return 0;
+	}
+	else
+	{
+		OutputDebugString( _T("구버전 입니다.\n"));
+		return -1;
+	}
+
+
+	return 0;
+ }
+
+
+
+
+
+CString JhonnyMain::HttpPostUserTokenBaaS(char* returnData, int length, CString id, CString pass, bool* activated)
+ {
+	 HINTERNET hInternetRoot = InternetOpen( _T("TestWinINet"),
+                                            INTERNET_OPEN_TYPE_PRECONFIG,
+                                            NULL,
+                                            NULL,
+                                            0);
+ 
+    HINTERNET hInternetConnect = InternetConnect(   hInternetRoot,
+                                                    _T("api.baas.io"),
+                                                    INTERNET_DEFAULT_HTTPS_PORT,
+                                                    _T(""),
+                                                    _T(""),
+                                                    INTERNET_SERVICE_HTTP,
+                                                    0,
+                                                    0);
+ 
+    HINTERNET hOpenRequest = HttpOpenRequest(   hInternetConnect,
+                                                _T("POST"),
+                                                _T("/14c45929-47a7-11e4-9866-06f4fe0000b5/1dd8c207-47a8-11e4-9866-06f4fe0000b5/token"),
+                                                HTTP_VERSION,
+                                                _T(""),
+                                                NULL,
+                                                INTERNET_FLAG_SECURE|INTERNET_FLAG_IGNORE_CERT_CN_INVALID|INTERNET_FLAG_IGNORE_CERT_DATE_INVALID,
+                                                0);
+ 
+	
+	
+    TCHAR szPostData[2048] = {0};
+	wsprintf(szPostData, _T("grant_type=password&username=%s&password=%s"), id, pass);
+    //lstrcpy(szPostData, "grant_type=password&username=jhonny&password=jhonny");
+ 
+    // post header
+    TCHAR szLen[MAX_PATH] = {0};
+    TCHAR szHeader[2048] = {0};
+
+
+ 
+    wsprintf(szLen, _T("%d"), lstrlen(szPostData));
+    lstrcpy(szHeader, _T("Accept: text/*\r\n"));
+    lstrcat(szHeader, _T("User-Agent: Mozilla/4.0 (compatible; MSIE 5.0;* Windows NT)\r\n"));
+    lstrcat(szHeader, _T("Content-type: application/x-www-form-urlencoded\r\n"));
+    lstrcat(szHeader, _T("Content-length: "));
+    lstrcat(szHeader, szLen);
+    lstrcat(szHeader, _T("\r\n\n"));
+	
+ 
+	int dwLength = _tcslen(szHeader) + 1; 
+	char *lpFormData = new char[dwLength]; 
+	WideCharToMultiByte(CP_ACP, 0, szHeader, dwLength, lpFormData, dwLength, NULL, NULL);
+	HttpAddRequestHeadersA(hOpenRequest, lpFormData, -1L, HTTP_ADDREQ_FLAG_ADD);
+	delete [] lpFormData; 
+
+
+	dwLength = _tcslen(szPostData) + 1; 
+	lpFormData = new char[dwLength]; 
+	WideCharToMultiByte(CP_ACP, 0, szPostData, dwLength, lpFormData, dwLength, NULL, NULL);
+    BOOL bSendRequest = HttpSendRequestA(hOpenRequest,
+                                        NULL,
+                                        0,
+                                        lpFormData,
+                                        strlen(lpFormData));
+	delete [] lpFormData; 
+
+	char data[2048]={0,};
+	DWORD dwSize = 0;
+    BOOL bRead = InternetReadFile(  hOpenRequest,
+                                    data,
+                                    2048,
+                                    &dwSize);
+	CString token;
+	CString access = _T("access_token");
+	CString inactived = _T("user not activated");
+	token = CString( data );
+	
+	int idx = token.Find(inactived);
+	if(activated != NULL)
+	{
+		if(idx == -1)
+			*activated = true;
+		else 
+			*activated = false;
+	}
+	
+
+	idx = token.Find(access);
+	if(idx == -1)
+		return _T("fail");
+
+
+
+	token = token.Mid(idx + access.GetLength()+2);
+	OutputDebugString(token);
+	OutputDebugString(_T("\n"));
+	idx = token.Find(_T("\""));
+	token = token.Mid(idx+1);
+
+	idx = token.Find(_T(","));
+	token = token.Left(idx-1);
+	
+	OutputDebugString(token);
+	OutputDebugString(_T("\n"));
+
+	BOOL bRet = InternetCloseHandle(hOpenRequest);
+	bRet = InternetCloseHandle(hInternetConnect);
+	bRet = InternetCloseHandle(hInternetRoot);
+	return token;
+ }
+
+int JhonnyMain::getFiles(TCHAR* path, TCHAR* extensionType, std::vector<TCHAR*>* fileList)
+{
+	TCHAR  filePathSearch[MAX_PATH]= _T("");
+	HANDLE hSrch;
+	WIN32_FIND_DATA stWinFindData;
+	BOOL   bResult = TRUE;
+	
+	StrCpyW(filePathSearch, path);
+	StrCatW(filePathSearch, extensionType);
+	hSrch = FindFirstFile ( filePathSearch, &stWinFindData );
+	if ( hSrch == INVALID_HANDLE_VALUE )
+		return -1;
+	fileList->clear();
+	
+
+	while ( bResult )
+	{
+		if ( !(stWinFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+		{
+			TCHAR* inputPath = new TCHAR[MAX_PATH];
+			wsprintf ( inputPath, _T("%s\\%s"), path, stWinFindData.cFileName );
+			fileList->push_back(inputPath);
+		}
+		bResult = FindNextFile ( hSrch, &stWinFindData );
+	}
+	FindClose(hSrch);
+	return 0;
+}
+
+std::string JhonnyMain::TCHARToString(const TCHAR* ptsz)
+{
+     int len = wcslen((wchar_t*)ptsz);
+     char* psz = new char[2*len + 1];
+     wcstombs(psz, (wchar_t*)ptsz, 2*len + 1);
+     std::string s = psz;
+     delete [] psz;
+     return s;
+}
+
+RECT JhonnyMain::getDlgRectRect()
+{
+	RECT rectDlgRT;
+	rectDlg->GetClientRect(&rectDlgRT);
+	rectDlg->ClientToScreen(&rectDlgRT);
+	return rectDlgRT;
 }
