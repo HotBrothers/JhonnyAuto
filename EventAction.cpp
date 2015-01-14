@@ -56,13 +56,18 @@ TCHAR* EventAction::generateItemID()
 int EventImageTouch::doAction(void* _main)
 {
 	JhonnyMain* main = (JhonnyMain*)_main;
-	int x = 0;
-	int y = 0;
+	int tx = 0;
+	int ty = 0;
 	eventLog.Format(_T("[이미지터치] : %s, "), name);
-	if(main->core->doMatching(main->pTargetMainWindow->GetSafeHwnd(), main->getDlgRectRect(), item, ifItems, name, &x, &y, &eventLog) == 0)
+	if(main->core->doMatching(main, item, ifItems, name, &tx, &ty, &eventLog) == 0)
 	{
-		int tx = 0; //= main->transCoord.x + x;
-		int ty = 0; //= main->transCoord.y + y;
+		int actionTransCoordX, actionTransCoordY;
+		HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+
+		tx += actionTransCoordX;
+		ty += actionTransCoordY;
+		EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LCLICK);
+	
 
 		/*
 		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
@@ -72,7 +77,7 @@ int EventImageTouch::doAction(void* _main)
 		}
 		*/
 		
-		EventSend::SendMouseEvent(main->targetWindow, tx, ty, MOUSE_LCLICK);
+		
 
 		/*
 		SetCursorPos(tx, ty);
@@ -95,16 +100,18 @@ int EventImageTouch::doReset()
 // 이미지 찾기
 int EventImageWait::doAction(void* _main)
 {
-	int x = 0;
-	int y = 0;
+	int tx = 0;
+	int ty = 0;
 	CString log;
 	JhonnyMain* main = (JhonnyMain*)_main;
 	eventLog.Format(_T("[이미지찾기] : %s, "), name);
-	if(main->core->doMatching(main->pTargetMainWindow->GetSafeHwnd(), main->getDlgRectRect(), item, ifItems, name, &x, &y, &eventLog) == 0)
+	if(main->core->doMatching(main, item, ifItems, name, &tx, &ty, &eventLog) == 0)
 	{
-		
-		int tx = 0; //= main->transCoord.x + x;
-		int ty = 0; //= main->transCoord.y + y;
+		int actionTransCoordX, actionTransCoordY;
+		HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+
+		tx += actionTransCoordX;
+		ty += actionTransCoordY;
 		/*
 		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
@@ -112,7 +119,7 @@ int EventImageWait::doAction(void* _main)
 			return 0;
 		}
 		*/
-		SetCursorPos(tx, ty);
+		
 		return findGotoIndex;
 	}
 	else 

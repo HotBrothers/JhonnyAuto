@@ -82,8 +82,16 @@ BOOL JhonnyRectDlg::OnInitDialog()
 void JhonnyRectDlg::OnMove(int x, int y)
 {
 	CDialog::OnMove(x, y);
-	((JhonnyMain*)main)->searchRectPoint.x = x;
-	((JhonnyMain*)main)->searchRectPoint.y = y;
+
+	((JhonnyMain*)main)->setTargetMainWndFromRectDlg();
+	CString caption = _T("스마트폰 화면을 넣어주세요 (800 x 450) -> ");
+	CString wndName;
+	((JhonnyMain*)main)->pTargetMainWindow->GetWindowTextW(wndName);
+	caption += wndName;
+	SetWindowText(caption);
+	SetIcon(	((JhonnyMain*)main)->pTargetMainWindow->GetIcon(false), false	);
+	//((JhonnyMain*)main)->searchRectPoint.x = x;
+	//((JhonnyMain*)main)->searchRectPoint.y = y;
 	// TODO: Add your message handler code here
 }
 

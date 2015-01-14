@@ -958,6 +958,27 @@ void JhonnyMain::OnLvnBegindragListPlaylist(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+void JhonnyMain::setTargetMainWndFromRectDlg()
+{
+	RECT rect = getDlgRectRect();
+	POINT pt;
+	pt.x = rect.left + (rect.right - rect.left) / 2.0;
+	pt.y = rect.top + (rect.bottom - rect.top) / 2.0;
+
+	
+	// 타겟 부모 윈도우 구함
+	targetWindow = ::WindowFromPoint(pt);
+	if(NULL != targetWindow)
+	{
+		pTargetMainWindow = CWnd::FromHandle (targetWindow);
+		while(pTargetMainWindow->GetParent() != NULL)
+			pTargetMainWindow = pTargetMainWindow->GetParent();
+
+		pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
+
+	}
+}
+
 void JhonnyMain::playAndStop()
 {
 	if(isMainWindowMinimized)
@@ -993,21 +1014,6 @@ void JhonnyMain::playAndStop()
 		editLogbox.SetScrollPos(SB_HORZ, 0);
 
 		
-		POINT pt = searchRectPoint;
-		pt.x += SEARCH_RECT_WIDTH / 2.0;
-		pt.y += SEARCH_RECT_HEGIHT / 2.0;
-	
-		// 타겟 부모 윈도우 구함
-		targetWindow = ::WindowFromPoint(pt);
-		if(NULL != targetWindow)
-		{
-			pTargetMainWindow = CWnd::FromHandle (targetWindow);
-			while(pTargetMainWindow->GetParent() != NULL)
-				pTargetMainWindow = pTargetMainWindow->GetParent();
-
-			pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
-
-		}
 		
 		
 		doPlay();

@@ -61,10 +61,21 @@ BOOL InputMouse::OnInitDialog()
 	
 	RECT rect = {0,};
 
-	HWND targetMainWnd = ((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd(); 
-	//((JhonnyMain*)AfxGetMainWnd())->rectDlg->GetClientRect(&rect);
-	jCore->captureScreen(targetMainWnd, rect, &hBit);
-	//lamp_image.Attach(hBit);
+	RECT cropRT = {0,};
+	RECT rectRT = ((JhonnyMain*)AfxGetMainWnd())->getDlgRectRect();
+	RECT targetMainRect = {0,};
+	((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetWindowRect(&targetMainRect);
+	//((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->ClientToScreen(&targetMainRect);
+	HWND targetMainWnd = ((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd();
+	POINT distance;
+	distance.x = targetMainRect.left - rectRT.left;
+	distance.y = targetMainRect.top - rectRT.top;
+	cropRT.left   = distance.x;
+	cropRT.top    = distance.y;
+	cropRT.right  = (rectRT.right - rectRT.left) + distance.x;
+	cropRT.bottom = (rectRT.bottom - rectRT.top) + distance.y;
+	jCore->captureScreen(targetMainWnd, cropRT, &hBit);
+
 
 
 	

@@ -42,7 +42,7 @@ public:
 
 	//bool captureScreen(HBITMAP* hBitmap, RECT rect);
 
-	int doMatching(HWND hTargetWnd, RECT rect, JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine);
+	int doMatching(void* _main, JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine);
 	
 
 private:

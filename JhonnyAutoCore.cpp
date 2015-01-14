@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "JhonnyAutoCore.h"
+#include "JhonnyMain.h"
 
 #define TIMER_ID 4001
 
@@ -42,15 +43,28 @@ JhonnyAutoCore::JhonnyAutoCore(double _threshold)
 }
 
 
-int JhonnyAutoCore::doMatching(HWND hTargetWnd, RECT rect, JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine)
+int JhonnyAutoCore::doMatching(void* _main,  JhonnyItem* item, JhonnyItem* ifItems, TCHAR* name, int* x, int* y, CString* strLine)
 {
+	JhonnyMain* main = (JhonnyMain*)_main;
 	HBITMAP hBit = NULL;
 	IplImage* dest;
 	CString result;
 
-	
+	RECT cropRT = {0,};
+	RECT rectRT = main->getDlgRectRect();
+	RECT targetMainRect = {0,};
+	main->pTargetMainWindow->GetWindowRect(&targetMainRect);
+	//((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->ClientToScreen(&targetMainRect);
+	HWND targetMainWnd = main->pTargetMainWindow->GetSafeHwnd();
+	POINT distance;
+	distance.x = targetMainRect.left - rectRT.left;
+	distance.y = targetMainRect.top - rectRT.top;
+	cropRT.left   = distance.x;
+	cropRT.top    = distance.y;
+	cropRT.right  = (rectRT.right - rectRT.left) + distance.x;
+	cropRT.bottom = (rectRT.bottom - rectRT.top) + distance.y;
 
-	if(captureScreen(hTargetWnd, rect, &hBit) == false || hBit == NULL)
+	if(captureScreen(targetMainWnd, cropRT, &hBit) == false || hBit == NULL)
 	{
 		strLine->Format(_T("이미지(NULL) 에러"));
 		DeleteObject(hBit);
@@ -320,7 +334,7 @@ bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBi
     HDC hDC = ::GetDC(hTargetWnd);
 
 	
-	// DIB의 형식을 정의한다.
+	// SRC DIB의 형식을 정의한다.
 	BITMAPINFO dib_define;
 	dib_define.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	dib_define.bmiHeader.biWidth = rct.right - rct.left;
@@ -334,23 +348,41 @@ bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBi
 	dib_define.bmiHeader.biClrImportant = 0;
 	dib_define.bmiHeader.biClrUsed = 0;
 
+	// DEST DIB의 형식을 정의한다.
+	BITMAPINFO dib_define_dest;
+	dib_define_dest.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	dib_define_dest.bmiHeader.biWidth = rect.right - rect.left;
+	dib_define_dest.bmiHeader.biHeight = rect.bottom - rect.top;
+	dib_define_dest.bmiHeader.biPlanes = 1;
+	dib_define_dest.bmiHeader.biBitCount = 24;
+	dib_define_dest.bmiHeader.biCompression = BI_RGB;
+	dib_define_dest.bmiHeader.biSizeImage = ((((rect.right - rect.left) * 24 + 31) & ~31) >> 3) * (rect.bottom - rect.top);
+	dib_define_dest.bmiHeader.biXPelsPerMeter = 0;
+	dib_define_dest.bmiHeader.biYPelsPerMeter = 0;
+	dib_define_dest.bmiHeader.biClrImportant = 0;
+	dib_define_dest.bmiHeader.biClrUsed = 0;
+
 	// DIB의 내부 이미지 비트 패턴을 참조할 포인터 변수
-	BYTE *p_image_data = NULL;
+	BYTE *p_src_image_data = NULL;
+	BYTE *p_dest_image_data = NULL;
 
 	// dib_define에 정의된 내용으로 DIB를 생성한다.
-	HBITMAP hBitmap = ::CreateDIBSection(hDC, &dib_define, DIB_RGB_COLORS, (void **)&p_image_data, 0, 0);
+	HBITMAP hSrcBitmap = ::CreateDIBSection(hDC, &dib_define, DIB_RGB_COLORS, (void **)&p_src_image_data, 0, 0);
+	HBITMAP hDestBitmap = ::CreateDIBSection(0, &dib_define_dest, DIB_RGB_COLORS, (void **)&p_dest_image_data, 0, 0);
 
 
-    HDC hMemDC = ::CreateCompatibleDC(hDC);
+    HDC hSrcDC = ::CreateCompatibleDC(hDC);
+	HDC hDestDC = ::CreateCompatibleDC(0);
 
 	
 
-    if(!hBitmap)
+    if(!hSrcBitmap)
         return FALSE;
 
-    hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
+    (HBITMAP)SelectObject(hSrcDC, hSrcBitmap);
+	(HBITMAP)SelectObject(hDestDC, hDestBitmap);
 
-    if(!::PrintWindow(hTargetWnd, hMemDC, 0))
+    if(!::PrintWindow(hTargetWnd, hSrcDC, 0))
         bSuccess = FALSE;
     else
         bSuccess = TRUE;
@@ -359,17 +391,18 @@ bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBi
 	//::BitBlt(hMemDC, 0, 0, rect.right - rect.left , rect.bottom - rect.top, hDC, -rect.left, -rect.top, SRCCOPY);
 	//::BitBlt(h_memory_dc, -startX, -startY, SEARCH_RECT_WIDTH+startX, SEARCH_RECT_HEGIHT+startY, h_screen_dc, 0, 0, SRCCOPY);
 
-	::BitBlt(hMemDC, 0, 0, rect.right - rect.left , rect.bottom - rect.top, hMemDC, -rect.left, -rect.top, SRCCOPY);
+	::BitBlt(hDestDC, 0, 0, rect.right - rect.left , rect.bottom - rect.top, hSrcDC, -rect.left, -rect.top, SRCCOPY);
 	 //hBitmap = ::CreateDiscardableBitmap
 	
-	//*returnBitmap = ScaleBitmapInt(hBitmap, rect.right - rect.left,   rect.bottom - rect.top);
+	*returnBitmap = hDestBitmap;
 
-	//::SelectObject(hMemDC, hOldBitmap);
+	//::SelectObject(hDestDC, hOldBitmap);
 	
 	
    
-    //DeleteObject(hBitmap);
-    ::DeleteDC(hMemDC);
+    DeleteObject(hSrcBitmap);
+    ::DeleteDC(hSrcDC);
+	::DeleteDC(hDestDC);
     ::ReleaseDC(hTargetWnd, hDC);
 
     return bSuccess;

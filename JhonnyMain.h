@@ -91,7 +91,7 @@ public:
 	CImageList* pImageItemsDrag;
 	CListCtrl listEvents;
 	CListCtrl listPlaylist;
-	POINT searchRectPoint;
+	//POINT searchRectPoint;
 	
 	bool isGuestMode;
 	void setGeustMode(bool isGuest);
@@ -112,6 +112,7 @@ public:
 	RECT returnTargetWindowRect;
 	bool isMainWindowMinimized;
 	HWND getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY);
+	void setTargetMainWndFromRectDlg();
 	RECT getDlgRectRect();
 
 	
