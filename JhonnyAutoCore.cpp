@@ -49,12 +49,14 @@ int JhonnyAutoCore::doMatching(void* _main,  JhonnyItem* item, JhonnyItem* ifIte
 	HBITMAP hBit = NULL;
 	IplImage* dest;
 	CString result;
-
 	RECT cropRT = {0,};
 	RECT rectRT = main->getDlgRectRect();
 	RECT targetMainRect = {0,};
+	
+	if(IsWindow(main->pTargetMainWindow->GetSafeHwnd()) == false)
+		return -1;
+
 	main->pTargetMainWindow->GetWindowRect(&targetMainRect);
-	//((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->ClientToScreen(&targetMainRect);
 	HWND targetMainWnd = main->pTargetMainWindow->GetSafeHwnd();
 	POINT distance;
 	distance.x = targetMainRect.left - rectRT.left;
@@ -318,7 +320,9 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 
 bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap)
 {
-	
+	if(IsWindow(hTargetWnd) == false)
+		return false;
+
     CRect rct;
     if(hTargetWnd)
         ::GetWindowRect(hTargetWnd, &rct);

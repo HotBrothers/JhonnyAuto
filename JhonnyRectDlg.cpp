@@ -9,6 +9,7 @@
 #include "afxdialogex.h"
 
 #define WM_DRAW_POINT	(WM_USER + 1000)
+#define TIMER_ID 86051500
 // JhonnyRectDlg dialog
 
 IMPLEMENT_DYNAMIC(JhonnyRectDlg, CDialog)
@@ -17,6 +18,7 @@ JhonnyRectDlg::JhonnyRectDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(JhonnyRectDlg::IDD, pParent)
 {
 	m_bDraw = FALSE;
+	m_bTouch = FALSE;
 	isMovable = true;
 }
 
@@ -35,9 +37,8 @@ BEGIN_MESSAGE_MAP(JhonnyRectDlg, CDialog)
 	ON_WM_MOVE()
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
 	ON_WM_WINDOWPOSCHANGING()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -83,8 +84,13 @@ void JhonnyRectDlg::OnMove(int x, int y)
 {
 	CDialog::OnMove(x, y);
 
+	
 	((JhonnyMain*)main)->setTargetMainWndFromRectDlg();
-	CString caption = _T("스마트폰 화면을 넣어주세요 (800 x 450) -> ");
+	if(((JhonnyMain*)main)->pTargetMainWindow == ((JhonnyMain*)main))
+		return ;
+
+	/*
+	CString caption = _T("[스마트폰 화면을 넣어주세요. (800 x 450)] 매크로 타겟 ==> ");
 	CString wndName;
 	((JhonnyMain*)main)->pTargetMainWindow->GetWindowTextW(wndName);
 	caption += wndName;
@@ -92,7 +98,7 @@ void JhonnyRectDlg::OnMove(int x, int y)
 	SetIcon(	((JhonnyMain*)main)->pTargetMainWindow->GetIcon(false), false	);
 	//((JhonnyMain*)main)->searchRectPoint.x = x;
 	//((JhonnyMain*)main)->searchRectPoint.y = y;
-	// TODO: Add your message handler code here
+	*/
 }
 
 
@@ -122,8 +128,7 @@ void JhonnyRectDlg::OnSysCommand(UINT nID, LPARAM lParam)
 void JhonnyRectDlg::DrawEllipse(HWND hWnd)
 {
 	/*
-	if(!m_bDraw)
-		return ;
+	
 		*/
 
 	PAINTSTRUCT ps;
@@ -131,24 +136,44 @@ void JhonnyRectDlg::DrawEllipse(HWND hWnd)
 	hDC = ::GetDC(hWnd);
 	if (hDC)
 	{
+		HPEN hNewP = NULL;
+		HBRUSH hNewB = NULL;
+		HPEN hOldP = NULL;
+		HBRUSH hOldB = NULL;
+
+		hNewP = CreatePen(PS_SOLID,3, RGB(0,192,228));  
+		hNewB = CreateSolidBrush(RGB(230,86,122));  
+
+
+
+		hOldP = (HPEN)SelectObject(hDC, hNewP);  
+		if(m_bTouch)
+			hOldB = (HBRUSH)SelectObject(hDC, hNewB);
+		else
+			hOldB = (HBRUSH)SelectObject(hDC, GetStockObject(NULL_BRUSH));
+		
+		  
 		if(m_bDraw)
 		{
-			HPEN hNewP = CreatePen(PS_SOLID,3, RGB(0,0,255));  
-			HBRUSH hNewB = CreateSolidBrush(RGB(255,0,0));  
+			if(m_bTouch)
+				Ellipse(hDC,m_pt.x+8,m_pt.y+8,m_pt.x-8,m_pt.y-8 );// gets pixel of 100
+			else
+				Rectangle(hDC, m_pt.x+20,m_pt.y+20,m_pt.x-20,m_pt.y-20);
+				//Ellipse(hDC,m_pt.x+20,m_pt.y+20,m_pt.x-20,m_pt.y-20 );// gets pixel of 100
 
-			HPEN hOldP = (HPEN)SelectObject(hDC, hNewP);  
-			HBRUSH hOldB = (HBRUSH)SelectObject(hDC, hNewB);  
-
-			Ellipse(hDC,m_pt.x+10,m_pt.y+10,m_pt.x-10,m_pt.y-10 );// gets pixel of 100   
-
-			SelectObject(hDC,hOldP);  //displace pen/brush from DC  
-			SelectObject(hDC,hOldB);		
-
-			DeleteObject(hNewP); //now can be deleted  
-			DeleteObject(hNewB);  
-
-			
+			SetTimer(TIMER_ID, 500, NULL);
+			InvalidateRect(NULL);
 		}
+
+		
+		SelectObject(hDC,hOldP);  //displace pen/brush from DC  
+		SelectObject(hDC,hOldB);		
+		DeleteObject(hNewP); //now can be deleted  
+		DeleteObject(hNewB); 
+		
+
+		
+
 		::ReleaseDC(hWnd,hDC);  
 		::EndPaint(hWnd, &ps);  
 		::ValidateRect(hWnd, NULL);  
@@ -157,25 +182,22 @@ void JhonnyRectDlg::DrawEllipse(HWND hWnd)
 }
 
 
+
+
 void JhonnyRectDlg::OnPaint()
 {
 	DrawEllipse(this->GetSafeHwnd());
 }
 
-void JhonnyRectDlg::OnLButtonDown(UINT nFlags, CPoint point)
+void JhonnyRectDlg::drawingPoint(CPoint point, BOOL _m_bTouch)
 {
 	m_bDraw = TRUE;
 	m_pt = point;
-	CDialog::OnLButtonDown(nFlags, point);
-}
-
-void JhonnyRectDlg::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	m_bDraw = FALSE;
-
+	m_bTouch = _m_bTouch;
 	InvalidateRect(NULL);
-	CDialog::OnLButtonUp(nFlags, point);
 }
+
+
 
 void JhonnyRectDlg::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 {
@@ -184,4 +206,25 @@ void JhonnyRectDlg::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 	CDialog::OnWindowPosChanging(lpwndpos);
 	
 	// TODO: Add your message handler code here
+}
+
+
+void JhonnyRectDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	CTime time = CTime::GetCurrentTime();
+	switch(nIDEvent)
+    {
+        case TIMER_ID:
+		{
+			
+			CPoint point(0,0);
+			m_bDraw = FALSE;
+			InvalidateRect(NULL);
+			//CDialog::OnLButtonUp(0, point);
+			
+		}
+        break;
+    }
+	CDialog::OnTimer(nIDEvent);
 }

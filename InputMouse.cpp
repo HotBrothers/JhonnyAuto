@@ -64,6 +64,11 @@ BOOL InputMouse::OnInitDialog()
 	RECT cropRT = {0,};
 	RECT rectRT = ((JhonnyMain*)AfxGetMainWnd())->getDlgRectRect();
 	RECT targetMainRect = {0,};
+	if(IsWindow(((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd()) == false)
+	{
+		AfxMessageBox(_T("기존 타겟 윈도우가 없습니다. 새로운 타겟 윈도우로 전환합니다."));
+		((JhonnyMain*)AfxGetMainWnd())->setTargetMainWndFromRectDlg();
+	}
 	((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetWindowRect(&targetMainRect);
 	//((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->ClientToScreen(&targetMainRect);
 	HWND targetMainWnd = ((JhonnyMain*)AfxGetMainWnd())->pTargetMainWindow->GetSafeHwnd();

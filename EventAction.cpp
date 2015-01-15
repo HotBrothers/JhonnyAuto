@@ -63,12 +63,25 @@ int EventImageTouch::doAction(void* _main)
 	{
 		int actionTransCoordX, actionTransCoordY;
 		HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+		if(actionTargetHandle == NULL )
+		{
+			eventLog.Format(_T("실패-매크로타겟없음[이미지터치] : %s"), name);
+			return 0;
+		}
+
+		CPoint pt;
+		pt.x = tx;
+		pt.y = ty;
+		main->rectDlg->drawingPoint(pt, TRUE);
+
+		beforeX = tx;
+		beforeY = ty;
 
 		tx += actionTransCoordX;
 		ty += actionTransCoordY;
+		
 		EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LCLICK);
 	
-
 		/*
 		if(tx < core->transCoord.x || ty < core->transCoord.y || tx > core->transCoord.x + SEARCH_RECT_WIDTH || ty > core->transCoord.y + SEARCH_RECT_HEGIHT)
 		{
@@ -105,10 +118,25 @@ int EventImageWait::doAction(void* _main)
 	CString log;
 	JhonnyMain* main = (JhonnyMain*)_main;
 	eventLog.Format(_T("[이미지찾기] : %s, "), name);
-	if(main->core->doMatching(main, item, ifItems, name, &tx, &ty, &eventLog) == 0)
+	int result = main->core->doMatching(main, item, ifItems, name, &tx, &ty, &eventLog);
+	if(result == 0)
 	{
 		int actionTransCoordX, actionTransCoordY;
 		HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+		if(actionTargetHandle == NULL)
+		{
+			eventLog.Format(_T("실패-매크로타겟없음[이미지찾기] : %s"), name);
+			return 0;
+		}
+
+		CPoint pt;
+		pt.x = tx;
+		pt.y = ty;
+		main->rectDlg->drawingPoint(pt, FALSE);
+
+
+		beforeX = tx;
+		beforeY = ty;
 
 		tx += actionTransCoordX;
 		ty += actionTransCoordY;
@@ -121,6 +149,11 @@ int EventImageWait::doAction(void* _main)
 		*/
 		
 		return findGotoIndex;
+	}
+	else if( result == -1)
+	{
+		eventLog.Format(_T("실패-매크로타겟없음[이미지찾기] : %s"), name);
+		return 0;
 	}
 	else 
 		return nofindGotoIndex;
@@ -193,7 +226,28 @@ int EventTouch::doAction(void* _main)
 
 	int actionTransCoordX, actionTransCoordY;
 	HWND actionTargetHandle = main->getTargetHandleFromPoint(tx, ty, &actionTransCoordX, &actionTransCoordY);
+	if(actionTargetHandle == NULL )
+	{
+		eventLog.Format(_T("실패-매크로타겟없음[터치] : %s"), name);
+		return 0;
+	}
+	CPoint pt;
+	pt.x = tx;
+	pt.y = ty;
+	main->rectDlg->drawingPoint(pt, TRUE);
+	//main->rectDlg->OnLButtonUp(0, pt);
 
+	if(isDrag)
+	{
+		beforeX = dx;
+		beforeY = dy;
+	}
+	else
+	{
+		beforeX = tx;
+		beforeY = ty;
+	}
+	
 	tx += actionTransCoordX;
 	ty += actionTransCoordY;
 	dx += actionTransCoordX;
@@ -243,6 +297,8 @@ int EventTouch::doAction(void* _main)
 		if(isRightClick == false)
 		{
 			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LCLICK);
+
+			
 			/*
 			SetCursorPos(tx, ty);
 			SetCursorPos(tx, ty);

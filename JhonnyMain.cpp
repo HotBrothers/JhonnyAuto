@@ -369,8 +369,18 @@ void JhonnyMain::OnMouseMove(UINT nFlags, CPoint point)
 void JhonnyMain::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	
-
+	/*
+	if(pTargetMainWindow == NULL || pTargetMainWindow->GetSafeHwnd() == this->GetSafeHwnd())
+	{
+		setTargetMainWndFromRectDlg();
+		CString caption = _T("[스마트폰 화면을 넣어주세요. (800 x 450)] 매크로 타겟 -> ");
+		CString wndName;
+		pTargetMainWindow->GetWindowTextW(wndName);
+		caption += wndName;
+		SetWindowText(caption);
+		SetIcon(	pTargetMainWindow->GetIcon(false), false	);
+	}
+	*/
 	if(isGuestMode == true)
 	{
 		delete pImageItemsDrag;
@@ -391,6 +401,7 @@ void JhonnyMain::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if(pImageItemsDrag != NULL)
 	{
+		setTargetMainWndFromRectDlg();
 		ClientToScreen(&point);
 		pImageItemsDrag->DragLeave(NULL);
 		pImageItemsDrag->EndDrag();
@@ -977,17 +988,34 @@ void JhonnyMain::setTargetMainWndFromRectDlg()
 		pTargetMainWindow->GetWindowRect(&targetMainWindowRect);
 
 	}
+
+	CString caption = _T("[스마트폰 화면을 넣어주세요. (800 x 450)] 매크로 타겟 ==> ");
+	CString wndName;
+	pTargetMainWindow->GetWindowTextW(wndName);
+	caption += wndName;
+	rectDlg->SetWindowText(caption);
+	rectDlg->SetIcon(pTargetMainWindow->GetIcon(false), false);
+
+	
 }
 
 void JhonnyMain::playAndStop()
 {
-	if(isMainWindowMinimized)
-		return;
+	
 
 	CString strLine;
 	if(listPlaylist.IsWindowEnabled())
 	{
+		if(isMainWindowMinimized)
+		{
+			AfxMessageBox(_T("최소화 된 상태에서는 시작할 수 없습니다."));
+			return;
+		}
+
+
+
 		rectDlg->setMoveable(false);
+		
 		POSITION listItemPos = listPlaylist.GetFirstSelectedItemPosition();
 		int listItemIndex = listPlaylist.GetNextSelectedItem(listItemPos);
 		if(listItemIndex == -1)
@@ -1017,7 +1045,7 @@ void JhonnyMain::playAndStop()
 		
 		
 		doPlay();
-		Sleep(1000);
+		//Sleep(1000);
 		btnStart.EnableWindow(true);
 	}
 	else
@@ -1344,6 +1372,10 @@ void JhonnyMain::doPlay()
 }
 HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY)
 {
+	
+	if(pTargetMainWindow == NULL || IsWindow(pTargetMainWindow->GetSafeHwnd()) == false)
+		return NULL;
+
 	int outCoord = 0;
 	if(isMainWindowMinimized)
 		outCoord = (int)GetSystemMetrics(SM_CYSCREEN);
@@ -1356,6 +1388,7 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 	RECT rectParent;
 	pTargetMainWindow->GetClientRect(&rectParent);
 	pTargetMainWindow->ClientToScreen(&rectParent);
+
 				
 				
 				
@@ -1365,9 +1398,25 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 
 	//CWnd* pWndMainTmp = pTargetMainWindow;
 				
-		CWnd* pWndMainTmp = pTargetMainWindow;
+	CWnd* pWndMainTmp = pTargetMainWindow;
 				
-	HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+	HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+	
+	// NULL 이면 Minimized 안된 곳에서 찾음
+	bool isMinimizedTemp = isMainWindowMinimized;
+	if(hTempHandle == NULL)
+	{
+		handlePt.y -= outCoord;
+		hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+		isMainWindowMinimized = false;
+	}
+	// 그래도 NULL 이면 오류로 인정하고 실패리턴
+	if(hTempHandle == NULL)
+	{
+		isMainWindowMinimized = isMinimizedTemp;
+		return NULL;
+	}
+
 	HWND hTargetHandle = hTempHandle;
 	CWnd* pWndTarget;
 	while(hTempHandle != NULL)
@@ -4168,7 +4217,7 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 	case SC_CLOSE:
 		if(isMainWindowMinimized)
 		{
-			if(pTargetMainWindow != NULL)
+			if(pTargetMainWindow != NULL )
 			{
 				pTargetMainWindow->ShowWindow(SW_RESTORE);
 				pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top, 0, 0, SWP_NOSIZE);
@@ -4177,18 +4226,21 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 		isMainWindowMinimized = false;
 		break;
 	case SC_MINIMIZE:
-		if(pTargetMainWindow != NULL)
+		if(pTargetMainWindow != NULL )
 		{
 			//int screenY = (int)GetSystemMetrics(SM_CYSCREEN);
 			pTargetMainWindow->ShowWindow(SW_RESTORE);
 			pTargetMainWindow->GetWindowRect(&returnTargetWindowRect); 
-			pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
+			
+			// 이벤트가 실행 중 일때만 실행
+			if(listPlaylist.IsWindowEnabled() == false)
+				pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
 
-			/*
-			rectDlg->ShowWindow(SW_RESTORE);
+			
 			rectDlg->GetWindowRect(&returnRectWindowRect); 
-			rectDlg->SetWindowPos(NULL, returnRectWindowRect.left, returnRectWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
-			*/
+			//pTargetMainWindow->GetWin
+			//rectDlg->SetWindowPos(NULL, returnRectWindowRect.left, returnRectWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
+			
 		}
 		isMainWindowMinimized = true;
 		break;
@@ -4559,8 +4611,38 @@ std::string JhonnyMain::TCHARToString(const TCHAR* ptsz)
 
 RECT JhonnyMain::getDlgRectRect()
 {
-	RECT rectDlgRT;
-	rectDlg->GetClientRect(&rectDlgRT);
-	rectDlg->ClientToScreen(&rectDlgRT);
+	RECT rectDlgRT={0,};
+	
+	if(isMainWindowMinimized == false)
+	{
+		rectDlg->GetClientRect(&rectDlgRT);
+		rectDlg->ClientToScreen(&rectDlgRT);
+	}
+	else
+	{
+		rectDlgRT = returnRectWindowRect;
+		rectDlgRT.top += screenY;
+		rectDlgRT.bottom += screenY;
+	}
 	return rectDlgRT;
 }
+
+/*
+RECT JhonnyMain::getTargetMainWndGetWndRect()
+{
+	RECT targetMainWndRT={0,};
+	
+	if(isMainWindowMinimized == false)
+	{
+		pTargetMainWindow->GetWindowRect(&targetMainWndRT);
+	}
+	else
+	{
+		targetMainWndRT = returnTargetMainWindowRect;
+		targetMainWndRT.top += screenY;
+		targetMainWndRT.bottom += screenY;
+	}
+	return targetMainWndRT;
+
+}
+*/

@@ -110,9 +110,11 @@ public:
 
 	RECT returnRectWindowRect;
 	RECT returnTargetWindowRect;
+	//RECT returnTargetMainWindowRect;
 	bool isMainWindowMinimized;
 	HWND getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY);
 	void setTargetMainWndFromRectDlg();
+	//RECT getTargetMainWndGetWndRect();
 	RECT getDlgRectRect();
 
 	
