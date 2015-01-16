@@ -14,6 +14,7 @@
 #define ID_RETURN 8
 
 static int beforeX, beforeY;
+static HWND beforeTargetHandle;
 
 class EventAction
 {

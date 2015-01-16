@@ -143,15 +143,75 @@ BOOL EventSend::SendMouseEvent(HWND hWnd, WORD posX1, WORD posY1, MOUSE_MACRO_EV
 	return TRUE;
 }
 
-BOOL EventSend::SendKeybdEvent(HWND hWnd, DWORD dwKeyValue, KEYBD_MACRO_EVNT evnt)
+BOOL EventSend::SendKeybdEvent(HWND hWnd, WORD wKeyValue, int event)
 {
 	//	Default
 	DWORD dwEvent = MK_LBUTTON;
 	DWORD dwMsgDown = WM_KEYDOWN;
 	DWORD dwMsgUp = WM_KEYUP;
 	DWORD dwExtendKey = 0;
+
+	BYTE byKeyState[256] = {0,};
 	
-	// 리턴 처리 필요
+	//	LPARAM 용
+	extraKeyInfo lParam = {};
+	lParam.scanCode = MapVirtualKey(wKeyValue, MAPVK_VK_TO_VSC);
+	//lParam.repeatCount = 0;
+
+	GetKeyboardState(byKeyState);
+
+	if((event & KEYBD_CTL) == KEYBD_CTL)
+		byKeyState[VK_CONTROL] |= 0x80;
+	if((event & KEYBD_SHIFT) == KEYBD_SHIFT)
+		byKeyState[VK_SHIFT] |= 0x80;
+	if((event & KEYBD_ALT) == KEYBD_ALT)
+	{
+		lParam.sysdown = 1;
+		dwMsgDown = WM_SYSKEYDOWN;
+		byKeyState[VK_MENU] |= 0x80;
+	}
+
+	DWORD foregroundThreadID = NULL;
+	DWORD ourThreadID = NULL;
+
+	foregroundThreadID = GetWindowThreadProcessId(hWnd, NULL);
+	ourThreadID = GetCurrentThreadId();
+
+	//	실패
+	if(NULL == foregroundThreadID || NULL == ourThreadID)
+		return FALSE;
+
+	//	해당 핸들이 활성화 되지 않은 상태에서 키인풋을 날리기 위해선
+	//	Thread단으로 Attach가 되어야함.
+	if (foregroundThreadID != ourThreadID)
+		AttachThreadInput(foregroundThreadID, ourThreadID, TRUE);
+
+	//	키보드 상태 변경
+	SetKeyboardState(byKeyState);
+	
+	PostMessage(hWnd, dwMsgDown, wKeyValue, lParam);
+
+	//	Test 결과 Message보낸 후에 키보드 상태 원복하는 코드로 바로 진입시
+	//	조합키가 안먹힐 수 있다.
+	Sleep(50);
+	
+	//	KEYUP 메시지 보내면 특정 핸들에서는 WM_CHAR 메시지 발생시킴
+	//	두번 입력된 것처럼 보일 수 있으니 안보내는 것이 나을 수 있음.
+	//PostMessage(hWnd, dwMsgUp, wKeyValue, 0);
+ 
+	if((event & KEYBD_CTL) == KEYBD_CTL)
+		byKeyState[VK_CONTROL] &= 0x00;
+	if((event & KEYBD_SHIFT) == KEYBD_SHIFT)
+		byKeyState[VK_SHIFT] &= 0x00;
+	if((event & KEYBD_ALT) == KEYBD_ALT)
+		byKeyState[VK_MENU] &= 0x00;
+
+	//	키보드 기존처럼 변경
+	SetKeyboardState(byKeyState);
+
+	if (foregroundThreadID != ourThreadID)
+		AttachThreadInput(foregroundThreadID, ourThreadID, FALSE);
+
 	return TRUE;
 }
 

@@ -76,6 +76,7 @@ int EventImageTouch::doAction(void* _main)
 
 		beforeX = tx;
 		beforeY = ty;
+		beforeTargetHandle = actionTargetHandle;
 
 		tx += actionTransCoordX;
 		ty += actionTransCoordY;
@@ -137,6 +138,7 @@ int EventImageWait::doAction(void* _main)
 
 		beforeX = tx;
 		beforeY = ty;
+		beforeTargetHandle = actionTargetHandle;
 
 		tx += actionTransCoordX;
 		ty += actionTransCoordY;
@@ -247,6 +249,7 @@ int EventTouch::doAction(void* _main)
 		beforeX = tx;
 		beforeY = ty;
 	}
+	beforeTargetHandle = actionTargetHandle;
 	
 	tx += actionTransCoordX;
 	ty += actionTransCoordY;
@@ -299,6 +302,7 @@ int EventTouch::doAction(void* _main)
 			EventSend::SendMouseEvent(actionTargetHandle, tx, ty, MOUSE_LCLICK);
 
 			
+			
 			/*
 			SetCursorPos(tx, ty);
 			SetCursorPos(tx, ty);
@@ -342,20 +346,53 @@ int EventTouch::doReset()
 // 키누르기
 int EventPressKey::doAction(void* _main)
 {
-	eventLog.Format(_T("[키] : 키를 누릅니다."));
-	if((mod & HOTKEYF_ALT) != 0 )
+	//WORD vkCode = VkKeyScan(L'f');
+
+	if(IsWindow(beforeTargetHandle) == false)
 	{
-		keybd_event(VK_MENU, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);   
-	} 
+		eventLog.Format(_T("실패-매크로타겟없음[키누르기]"));
+		return 0;
+	}
+	
+	int optionKey = 0;
+	CString outputKeyName;
+	
 	if((mod & HOTKEYF_CONTROL) !=0 )
 	{
-		keybd_event(VK_CONTROL, 0x45, KEYEVENTF_EXTENDEDKEY  | 0, 0);   
+		optionKey |= KEYBD_CTL;
+		outputKeyName += _T("CTRL+");
 	}
 	if((mod & HOTKEYF_SHIFT) !=0 )
 	{
-		keybd_event(VK_SHIFT, 0x45, KEYEVENTF_EXTENDEDKEY  | 0, 0);   
+		optionKey |= KEYBD_SHIFT;
+		outputKeyName += _T("SHIFT+");
+	}
+	if((mod & HOTKEYF_ALT) != 0 )
+	{
+		optionKey |= KEYBD_ALT;
+		outputKeyName += _T("ALT+");
 	}
 
+	TCHAR buffer[5];
+	BYTE keyboard_state[256];
+	::GetKeyboardState( keyboard_state );
+	HKL keyboard_layout = ::GetKeyboardLayout( 0 );
+
+	
+	int result = ::ToUnicodeEx( vk, MapVirtualKey(vk, MAPVK_VK_TO_VSC), keyboard_state, buffer, 4, 0, keyboard_layout );
+	buffer[4] = L'\0';
+
+	if( result > 0 ) {
+    // Could convert, so do your stuff
+		outputKeyName += buffer;
+		eventLog.Format(_T("[키] : %s 키를 누릅니다."), outputKeyName);
+		EventSend::SendKeybdEvent(beforeTargetHandle, vk, optionKey);  
+	}
+
+
+	
+
+	/*
 	keybd_event(vk, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);   
 	keybd_event(vk, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 
@@ -371,7 +408,7 @@ int EventPressKey::doAction(void* _main)
 	{
 		keybd_event(VK_SHIFT, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0); 
 	}
-	
+	*/
 	return 0;
 }
 
