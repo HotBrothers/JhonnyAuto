@@ -4237,7 +4237,8 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 				pTargetMainWindow->SetWindowPos(NULL, returnTargetWindowRect.left, returnTargetWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
 
 			
-			rectDlg->GetWindowRect(&returnRectWindowRect); 
+			rectDlg->GetClientRect(&returnRectWindowRect);
+			rectDlg->ClientToScreen(&returnRectWindowRect);
 			//pTargetMainWindow->GetWin
 			//rectDlg->SetWindowPos(NULL, returnRectWindowRect.left, returnRectWindowRect.top + screenY, 0, 0, SWP_NOSIZE);
 			
