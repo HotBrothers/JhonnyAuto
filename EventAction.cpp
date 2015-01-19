@@ -152,11 +152,6 @@ int EventImageWait::doAction(void* _main)
 		
 		return findGotoIndex;
 	}
-	else if( result == -1)
-	{
-		eventLog.Format(_T("실패-매크로타겟없음[이미지찾기] : %s"), name);
-		return 0;
-	}
 	else 
 		return nofindGotoIndex;
 }

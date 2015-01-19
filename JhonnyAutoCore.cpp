@@ -54,7 +54,11 @@ int JhonnyAutoCore::doMatching(void* _main,  JhonnyItem* item, JhonnyItem* ifIte
 	RECT targetMainRect = {0,};
 	
 	if(IsWindow(main->pTargetMainWindow->GetSafeHwnd()) == false)
+	{
+		strLine->Format(_T("실패-매크로타겟없음[이미지찾기] : %s"), name);
 		return -1;
+	}
+
 
 	main->pTargetMainWindow->GetWindowRect(&targetMainRect);
 	HWND targetMainWnd = main->pTargetMainWindow->GetSafeHwnd();

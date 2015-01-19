@@ -51,7 +51,6 @@ BOOL CJhonnyAutoApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-
 	AfxEnableControlContainer();
 
 	// 대화 상자에 셸 트리 뷰 또는
