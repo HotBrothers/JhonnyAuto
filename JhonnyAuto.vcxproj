@@ -131,7 +131,6 @@
     <ClInclude Include="JhonnyRegister.h" />
     <ClInclude Include="JhonnyRunItem.h" />
     <ClInclude Include="JhonnySignUp.h" />
-    <ClInclude Include="MfcUtil.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RexAlgorithm.h" />
     <ClInclude Include="RexInterface.h" />
@@ -165,7 +164,6 @@
     <ClCompile Include="JhonnyRegister.cpp" />
     <ClCompile Include="JhonnyRunItem.cpp" />
     <ClCompile Include="JhonnySignUp.cpp" />
-    <ClCompile Include="MfcUtil.cpp" />
     <ClCompile Include="RexAlgorithm.cpp" />
     <ClCompile Include="RexInterface.cpp" />
     <ClCompile Include="stdafx.cpp">

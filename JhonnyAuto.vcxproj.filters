@@ -111,9 +111,6 @@
     <ClInclude Include="EventSend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MfcUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JhonnyAuto.cpp">
@@ -201,9 +198,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EventSend.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MfcUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
