@@ -49,6 +49,9 @@ int JhonnyAutoCore::doMatching(void* _main,  JhonnyItem* item, JhonnyItem* ifIte
 	HBITMAP hBit = NULL;
 	IplImage* dest;
 	CString result;
+
+	/*
+	// 비활성화 모드
 	RECT cropRT = {0,};
 	RECT rectRT = main->getDlgRectRect();
 	RECT targetMainRect = {0,};
@@ -69,8 +72,9 @@ int JhonnyAutoCore::doMatching(void* _main,  JhonnyItem* item, JhonnyItem* ifIte
 	cropRT.top    = distance.y;
 	cropRT.right  = (rectRT.right - rectRT.left) + distance.x;
 	cropRT.bottom = (rectRT.bottom - rectRT.top) + distance.y;
-
-	if(captureScreen(targetMainWnd, cropRT, &hBit) == false || hBit == NULL)
+	*/
+	RECT rectPos = main->getDlgRectRect();
+	if(captureScreen(&hBit, rectPos) == false || hBit == NULL)
 	{
 		strLine->Format(_T("이미지(NULL) 에러"));
 		DeleteObject(hBit);
@@ -254,7 +258,7 @@ BOOL SaveToFile(HBITMAP hBitmap, LPCTSTR lpszFileName)
 	return TRUE;
 }
 
-/*
+
 bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 {
 	// 있어도 되나
@@ -264,6 +268,9 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 
 
 	HDC h_screen_dc = ::GetDC(NULL);
+
+	int width = rect.right - rect.left;
+	int height = rect.bottom - rect.top;
 
 	// 현재 스크린의 해상도를 얻는다.
 	//int width = ::GetDeviceCaps(h_screen_dc, HORZRES);
@@ -300,8 +307,8 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 	//::BitBlt(h_memory_dc, 0, 0, width, height, h_screen_dc, 0, 0, SRCCOPY);
 
 
-	::BitBlt(h_memory_dc, rect.left, rect.top, (rect.right - rect.left), (rect.bottom - rect.top), h_screen_dc, 0, 0, SRCCOPY);
-
+	//::BitBlt(h_memory_dc, rect.left, rect.top, (rect.right - rect.left), (rect.bottom - rect.top), h_screen_dc, 0, 0, SRCCOPY);
+	::BitBlt(h_memory_dc, 0, 0, width, height, h_screen_dc, rect.left, rect.top, SRCCOPY);
 
 	// 본래의 비트맵으로 복구한다.
 	::SelectObject(h_memory_dc, h_old_bitmap);
@@ -320,8 +327,10 @@ bool JhonnyAutoCore::captureScreen(HBITMAP* hBitmap, RECT rect)
 	return true;
 
 }
-*/
 
+
+
+/*
 bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap)
 {
 	if(IsWindow(hTargetWnd) == false)
@@ -415,6 +424,8 @@ bool JhonnyAutoCore::captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBi
 
     return bSuccess;
 }
+*/
+
 
 bool JhonnyAutoCore::hBitmap2Ipl(HBITMAP* hBmp, IplImage** pIplImage)
 {

@@ -7,4 +7,5 @@ class MfcUtil
 public:
 	static void ShowTaskbarIcon(HWND WindowHandle);
 	static void HideTaskbarIcon(HWND WindowHandle);
+	static HICON GetAppIcon(HWND hwnd);
 };

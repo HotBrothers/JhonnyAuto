@@ -48,8 +48,16 @@ END_MESSAGE_MAP()
 BOOL JhonnyRectDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	const int width = 800;
+	const int height = 450;
+	RECT wndRect = {0, 0, width, height};
+	AdjustWindowRect(&wndRect, WS_OVERLAPPEDWINDOW, FALSE);
+	int reWidth = wndRect.right - wndRect.left;
+	int reHeight = wndRect.bottom - wndRect.top;
+	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, reWidth, reHeight, 0);
 
-	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
+
+	//this->SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
 	 typedef BOOL(WINAPI *SLWA)(HWND,COLORREF,BYTE,DWORD);
     SLWA pSetLayeredWindowAttributes = NULL;
     HINSTANCE hmodUSER32 = LoadLibrary(_T("USER32.DLL"));
@@ -85,9 +93,17 @@ void JhonnyRectDlg::OnMove(int x, int y)
 	CDialog::OnMove(x, y);
 
 	
-	((JhonnyMain*)main)->setTargetMainWndFromRectDlg();
-	if(((JhonnyMain*)main)->pTargetMainWindow == ((JhonnyMain*)main))
-		return ;
+	if(main != NULL && IsWindow(((JhonnyMain*)main)->GetSafeHwnd()))
+	{
+		
+		((JhonnyMain*)main)->setTargetMainWndFromRectDlg();
+		/*
+		if(((JhonnyMain*)main)->pTargetMainWindow == ((JhonnyMain*)main))
+			return ;
+			*/
+	}
+	
+	
 
 	/*
 	CString caption = _T("[스마트폰 화면을 넣어주세요. (800 x 450)] 매크로 타겟 ==> ");
@@ -121,6 +137,10 @@ void JhonnyRectDlg::OnSysCommand(UINT nID, LPARAM lParam)
     {
 		return ;
     }
+	else if((nID & 0xFFF0) == SC_RESTORE)
+	{
+		return;
+	}
 	CDialog::OnSysCommand(nID, lParam);
 }
 

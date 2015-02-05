@@ -58,7 +58,8 @@ BOOL InputMouse::OnInitDialog()
 	
 	CStatic *p_lamp_image = (CStatic *)GetDlgItem(IDC_STATIC_INPUT);
 	CBitmap lamp_image;
-	
+	/*
+	// 비활성화 버전
 	RECT rect = {0,};
 
 	RECT cropRT = {0,};
@@ -79,7 +80,12 @@ BOOL InputMouse::OnInitDialog()
 	cropRT.top    = distance.y;
 	cropRT.right  = (rectRT.right - rectRT.left) + distance.x;
 	cropRT.bottom = (rectRT.bottom - rectRT.top) + distance.y;
-	jCore->captureScreen(targetMainWnd, cropRT, &hBit);
+	*/
+
+	RECT rectPos;
+	((JhonnyMain*)AfxGetMainWnd())->rectDlg->GetClientRect(&rectPos);
+	((JhonnyMain*)AfxGetMainWnd())->rectDlg->ClientToScreen(&rectPos);
+	jCore->captureScreen(&hBit, rectPos);
 
 
 

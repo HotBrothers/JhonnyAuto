@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MfcUtil.h"
 #include <Shobjidl.h>
 
@@ -19,4 +20,25 @@ void MfcUtil::ShowTaskbarIcon(HWND WindowHandle)
     if (Result) TaskListPtr->AddTab(WindowHandle);
     TaskListPtr->Release();
     CoUninitialize();
+}
+
+
+HICON MfcUtil::GetAppIcon(HWND hwnd)
+{
+  HICON iconHandle = (HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL2,0);
+  
+  if(iconHandle == NULL)
+    iconHandle = (HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0);
+  if(iconHandle == NULL)
+    iconHandle = (HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0);
+  if (iconHandle == NULL)
+    iconHandle = (HICON)GetClassLongPtr(hwnd, GCL_HICON);
+  if (iconHandle == NULL)
+    iconHandle = (HICON)GetClassLongPtr(hwnd, GCL_HICONSM);
+ 
+  if(iconHandle == NULL)
+    return NULL;
+
+ 
+  return iconHandle;
 }

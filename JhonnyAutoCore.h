@@ -36,7 +36,8 @@ public:
 	void setThreshold(float _threshold){ threshold = _threshold;}
 	void setTransCoord(POINT _transCoord){ transCoord = _transCoord;}
 	
-	bool captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap);
+	//bool captureScreen(HWND hTargetWnd, RECT rect, HBITMAP* returnBitmap);
+	bool captureScreen(HBITMAP* hBitmap, RECT rect);
 	bool hBitmap2Ipl(HBITMAP* hBmp, IplImage** pIplImage);
 	bool matching(IplImage* background, IplImage* object, CvPoint* rect ,double* returnScore, double threshold);
 

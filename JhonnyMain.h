@@ -5,12 +5,13 @@
 #include "JhonnyAutoCore.h"
 #include "JhonnyRectDlg.h"
 #include "JhonnyLoadingDlg.h"
-
+#include "ViewerDlg.h"
 
 #include "JhonnyAuto.h"
 #include "JhonnyRunItem.h"
 #include "JhonnyRegister.h"
 #include "JhonnyAbout.h"
+#include "MfcUtil.h"
 
 #include "zip.h"
 #include "unzip.h"
@@ -78,6 +79,7 @@ public:
 	JhonnyAutoCore* core;
 	JhonnyRectDlg* rectDlg;
 	JhonnyLoadingDlg* loadingDlg;
+	ViewerDlg* viewer;
 	//std::vector<JhonnyItem*> items;
 
 	TCHAR listItemDirName[100];
@@ -109,9 +111,9 @@ public:
 	//POINT transCoord;
 
 	RECT returnRectWindowRect;
-	RECT returnTargetWindowRect;
+	//RECT returnTargetWindowRect;
 	//RECT returnTargetMainWindowRect;
-	bool isMainWindowMinimized;
+	//bool isMainWindowMinimized;
 	HWND getTargetHandleFromPoint(int inputX, int inputY, int *transCoordX, int *transCoordY);
 	void setTargetMainWndFromRectDlg();
 	//RECT getTargetMainWndGetWndRect();

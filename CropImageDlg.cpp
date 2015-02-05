@@ -66,6 +66,17 @@ BOOL CropImageDlg::OnInitDialog()
 	//CBitmap lamp_image;
 	
 	//SaveToFile(&hBit);
+	
+	RECT rectPos;
+	((JhonnyMain*)AfxGetMainWnd())->rectDlg->GetClientRect(&rectPos);
+	((JhonnyMain*)AfxGetMainWnd())->rectDlg->ClientToScreen(&rectPos);
+	jCore->captureScreen(&hBit, rectPos);
+
+
+	
+
+	/*
+	// 비활성 스크린샷
 	RECT cropRT = {0,};
 	RECT rectRT = ((JhonnyMain*)AfxGetMainWnd())->getDlgRectRect();
 	RECT targetMainRect = {0,};
@@ -85,6 +96,7 @@ BOOL CropImageDlg::OnInitDialog()
 	cropRT.right  = (rectRT.right - rectRT.left) + distance.x;
 	cropRT.bottom = (rectRT.bottom - rectRT.top) + distance.y;
 	jCore->captureScreen(targetMainWnd, cropRT, &hBit);
+	*/
 	//lamp_image.Attach(hBit);
 
 

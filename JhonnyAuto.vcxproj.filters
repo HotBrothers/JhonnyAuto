@@ -114,6 +114,9 @@
     <ClInclude Include="MfcUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ViewerDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JhonnyAuto.cpp">
@@ -206,6 +209,9 @@
     <ClCompile Include="MfcUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ViewerDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="JhonnyAuto.rc">
@@ -263,6 +269,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\icon2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\drag.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

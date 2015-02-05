@@ -138,6 +138,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="unzip.h" />
+    <ClInclude Include="ViewerDlg.h" />
     <ClInclude Include="zip.h" />
     <ClInclude Include="ZipHelper.h" />
   </ItemGroup>
@@ -173,6 +174,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="unzip.cpp" />
+    <ClCompile Include="ViewerDlg.cpp" />
     <ClCompile Include="zip.cpp" />
     <ClCompile Include="ZipHelper.cpp" />
   </ItemGroup>
@@ -191,6 +193,7 @@
   <ItemGroup>
     <Image Include="..\..\..\..\Pictures\display\drag.ico" />
     <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\drag.ico" />
     <Image Include="res\goto.ico" />
     <Image Include="res\icon2.ico" />
     <Image Include="res\if_item.bmp" />
