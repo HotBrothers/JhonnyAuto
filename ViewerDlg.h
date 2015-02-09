@@ -34,8 +34,8 @@ public:
 	CBitmapButtonTrans btnStart;
 	CBitmapButtonTrans btnPause;
 	CBitmapButtonTrans btnStop;
-	CColorStatic stNow;
-	CColorStatic stTotal;
+	CColorStatic* stNow;
+	CColorStatic* stTotal;
 
 	void setTargetWindow(HWND hWnd){ wndTarget = hWnd;}
 	void setReturnTargetWindow(RECT rect){ returnTargetWindow = rect;}

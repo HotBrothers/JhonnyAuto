@@ -36,6 +36,9 @@ CColorStatic::CColorStatic()
 	m_crBkColor = ::GetSysColor(COLOR_3DFACE); // Initializing the Background Color to the system face color.
 	m_crTextColor = RGB(0,  0,  0); // Initializing the text to Black
 	m_brBkgnd.CreateSolidBrush(m_crBkColor); // Create the Brush Color for the Background.
+		
+    font.CreateFont(12, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET
+	, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, _T("MS Shell Dlg")); 
 }
 
 CColorStatic::~CColorStatic()
@@ -58,6 +61,7 @@ HBRUSH CColorStatic::CtlColor(CDC* pDC, UINT nCtlColor)
 	hbr = (HBRUSH)m_brBkgnd; // Passing a Handle to the Brush
 	pDC->SetBkColor(m_crBkColor); // Setting the Color of the Text Background to the one passed by the Dialog
 	pDC->SetTextColor(m_crTextColor); // Setting the Text Color to the one Passed by the Dialog
+	pDC->SelectObject(&font);
 
 	if (nCtlColor)       // To get rid of compiler warning
       nCtlColor += 0;

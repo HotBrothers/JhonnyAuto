@@ -28,10 +28,11 @@ public:
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CColorStatic)
-
+	CFont font;
 	CBrush m_brBkgnd; // Holds Brush Color for the Static Text
 	COLORREF m_crBkColor; // Holds the Background Color for the Text
 	COLORREF m_crTextColor; // Holds the Color for the Text
+		
 
 	afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
 	//}}AFX_MSG

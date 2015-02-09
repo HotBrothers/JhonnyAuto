@@ -75,17 +75,21 @@ BOOL ViewerDlg::OnInitDialog()
 	btnStop.SetHoverBitmapID(IDB_BITMAP_STOP_ON);  
 	btnStop.SizeToContent();
 
-	CStatic* player = new CStatic();
-	player->Create(_T("123"), WS_CHILD|WS_VISIBLE|SS_CENTER, CRect(0, 0,50,100), this);
+	//CStatic* player = new CStatic();
+	//player->Create(_T("123"), WS_CHILD|WS_VISIBLE|SS_CENTER, CRect(0, 0,50,100), this);
 
-	CStatic * stcTemp;
 
-	stNow.Create(_T("123"), WS_CHILD|WS_VISIBLE|SS_CENTER, CRect(148, 460,50,10), this);
-	stNow.SetTextColor(RGB(255,255,255)); //Changes the Edit Box text to Blue
-    stNow.SetBkColor(RGB(0,0,0));  //By default your background color is the
+	
+	stNow = new CColorStatic();
+	stNow->Create(_T("1111"), WS_CHILD | WS_VISIBLE | SS_RIGHT, CRect(108, 460,138,480), this);
+	stNow->SetTextColor(RGB(255,255,255)); //Changes the Edit Box text to Blue
+    stNow->SetBkColor(RGB(26,26,26));  //By default your background color is the
+
+	stTotal = new CColorStatic();
+	stTotal->Create(_T(" / 1432"), WS_CHILD | WS_VISIBLE | SS_LEFT, CRect(138, 460,178,480), this);
+	stTotal->SetTextColor(RGB(142,142,142)); //Changes the Edit Box text to Blue
+    stTotal->SetBkColor(RGB(26,26,26));  //By default your background color is the
  
-
-	//btnStart.SetWindowPos(NULL, 15, 453, 0, 0, SWP_NOSIZE);
 	
 	
 	return TRUE;
@@ -94,11 +98,6 @@ BOOL ViewerDlg::OnInitDialog()
 
 BOOL ViewerDlg::doDwmCapture(RECT src)
 {
-	return false;
-	
-	
-
-
 	const int width = 800;
 	const int height = 450;
 
