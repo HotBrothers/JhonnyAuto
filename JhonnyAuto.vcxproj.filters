@@ -117,6 +117,15 @@
     <ClInclude Include="ViewerDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ViewerRectDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBitmapButtonTrans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorStatic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JhonnyAuto.cpp">
@@ -212,6 +221,15 @@
     <ClCompile Include="ViewerDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ViewerRectDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBitmapButtonTrans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorStatic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="JhonnyAuto.rc">
@@ -272,6 +290,30 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\drag.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_start.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_start_on.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_pause.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_pause_on.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_stop.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_stop_on.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\btn_stop_inv.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -3,9 +3,14 @@
 
 #include "stdafx.h"
 #include "JhonnyAuto.h"
+
 #include "ViewerDlg.h"
 #include "afxdialogex.h"
 #include "MfcUtil.h"
+
+#define BTN_START_ID 15800
+#define BTN_PAUSE_ID 15801
+#define BTN_STOP_ID  15802
 
 // ViewerDlg dialog
 
@@ -16,6 +21,9 @@ ViewerDlg::ViewerDlg(CWnd* pParent /*=NULL*/)
 {
 	wndTarget = NULL;
 	thumbnail = NULL;
+	viewerRectDlg = NULL;
+	isPlay = true;
+	isStop = false;
 }
 
 ViewerDlg::~ViewerDlg()
@@ -31,24 +39,53 @@ void ViewerDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(ViewerDlg, CDialogEx)
 	ON_WM_CLOSE()
+	ON_WM_MOVE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
 // ViewerDlg message handlers
-
+// icon 15x15
 
 BOOL ViewerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	const int width = 800;
-	const int height = 450;
+	const int height = 480;			// capture 450 + player bar 27 + status bar 3				
 	RECT wndRect = {0, 0, width, height};
 	AdjustWindowRect(&wndRect, WS_OVERLAPPEDWINDOW, FALSE);
 	int reWidth = wndRect.right - wndRect.left;
 	int reHeight = wndRect.bottom - wndRect.top;
 	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, reWidth, reHeight, 0);
 	
+	btnStart.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_START_ID);
+	btnStart.LoadBitmaps(IDB_BITMAP_PLAY, IDB_BITMAP_PLAY, IDB_BITMAP_PLAY, IDB_BITMAP_PLAY);
+	btnStart.SetHoverBitmapID(IDB_BITMAP_PLAY_ON);  
+	btnStart.SizeToContent();
+	btnStart.ShowWindow(false);
 
+	btnPause.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_PAUSE_ID);
+	btnPause.LoadBitmaps(IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE);
+	btnPause.SetHoverBitmapID(IDB_BITMAP_PAUSE_ON);  
+	btnPause.SizeToContent();
+	
+
+	btnStop.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(78, 460,50,50), this, BTN_STOP_ID);
+	btnStop.LoadBitmaps(IDB_BITMAP_STOP, IDB_BITMAP_STOP, IDB_BITMAP_STOP, IDB_BITMAP_STOP_INV);
+	btnStop.SetHoverBitmapID(IDB_BITMAP_STOP_ON);  
+	btnStop.SizeToContent();
+
+	CStatic* player = new CStatic();
+	player->Create(_T("123"), WS_CHILD|WS_VISIBLE|SS_CENTER, CRect(0, 0,50,100), this);
+
+	CStatic * stcTemp;
+
+	stNow.Create(_T("123"), WS_CHILD|WS_VISIBLE|SS_CENTER, CRect(148, 460,50,10), this);
+	stNow.SetTextColor(RGB(255,255,255)); //Changes the Edit Box text to Blue
+    stNow.SetBkColor(RGB(0,0,0));  //By default your background color is the
+ 
+
+	//btnStart.SetWindowPos(NULL, 15, 453, 0, 0, SWP_NOSIZE);
 	
 	
 	return TRUE;
@@ -57,7 +94,7 @@ BOOL ViewerDlg::OnInitDialog()
 
 BOOL ViewerDlg::doDwmCapture(RECT src)
 {
-
+	return false;
 	
 	
 
@@ -125,6 +162,13 @@ BOOL ViewerDlg::doDwmCapture(RECT src)
 			//captureDX(this->GetSafeHwnd());
 			// ...
 			//target->ShowWindow(SW_HIDE);
+
+
+
+			viewerRectDlg = new ViewerRectDlg();
+			viewerRectDlg->Create(IDD_DIALOG_VIEWER_RECT, this);
+			viewerRectDlg->ShowWindow(SW_SHOW);
+
 		}
 	}
 }
@@ -147,4 +191,67 @@ void ViewerDlg::OnClose()
 	::ShowWindow(wndMain, SW_RESTORE);
 	::SetWindowPos(wndTarget, NULL, returnTargetWindow.left, returnTargetWindow.top, 0, 0, SWP_NOSIZE);
 	CDialogEx::OnClose();
+}
+
+
+void ViewerDlg::OnMove(int x, int y)
+{
+	CDialogEx::OnMove(x, y);
+	if(viewerRectDlg != NULL)
+		viewerRectDlg->SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOSENDCHANGING );
+	// TODO: Add your message handler code here
+}
+
+
+BOOL ViewerDlg::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: Add your message handler code here and/or call default
+	CRect rect;
+    GetClientRect(&rect);
+    CBrush myBrush(RGB(26, 26, 26));    // dialog background color <- 요기 바꾸면 됨.
+	CBrush myBrush2(RGB(119, 119, 119));    // dialog background color <- 요기 바꾸면 됨.
+    CBrush *pOld = pDC->SelectObject(&myBrush);
+	
+
+    BOOL bRes  = pDC->PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
+
+	pDC->SelectObject(&myBrush2);
+	bRes  = pDC->PatBlt(0, 450, rect.Width(), 3, PATCOPY);
+
+    pDC->SelectObject(pOld);    // restore old brush
+
+    return bRes;                       // CDialog::OnEraseBkgnd(pDC);
+	return CDialogEx::OnEraseBkgnd(pDC);
+}
+
+
+BOOL ViewerDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	 if (HIWORD(wParam) == BN_CLICKED) 
+    { 
+         switch (LOWORD(wParam))    // Button ID 
+         { 
+             case BTN_START_ID: 
+				btnStart.ShowWindow(FALSE);
+				btnPause.ShowWindow(TRUE);
+				btnStop.EnableWindow(true);
+				isStop = false;
+				isPlay = true;
+				break; 
+			case BTN_PAUSE_ID: 
+				btnStart.ShowWindow(TRUE);
+				btnPause.ShowWindow(FALSE);
+				isPlay = false;
+				break;
+			case BTN_STOP_ID: 
+				btnStop.EnableWindow(false);
+				btnStart.ShowWindow(TRUE);
+				btnPause.ShowWindow(FALSE);
+				isStop = true;
+				isPlay = false;
+				break;
+         } 
+    } 
+	return CDialogEx::OnCommand(wParam, lParam);
 }

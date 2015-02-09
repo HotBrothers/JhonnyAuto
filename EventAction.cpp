@@ -72,7 +72,10 @@ int EventImageTouch::doAction(void* _main)
 		CPoint pt;
 		pt.x = tx;
 		pt.y = ty;
-		main->rectDlg->drawingPoint(pt, TRUE);
+		if(main->IsIconic())
+			main->viewer->viewerRectDlg->drawingPoint(pt, TRUE);
+		else
+			main->rectDlg->drawingPoint(pt, TRUE);
 
 		beforeX = tx;
 		beforeY = ty;
@@ -133,7 +136,10 @@ int EventImageWait::doAction(void* _main)
 		CPoint pt;
 		pt.x = tx;
 		pt.y = ty;
-		main->rectDlg->drawingPoint(pt, FALSE);
+		if(main->IsIconic())
+			main->viewer->viewerRectDlg->drawingPoint(pt, FALSE);
+		else
+			main->rectDlg->drawingPoint(pt, FALSE);
 
 
 		beforeX = tx;
@@ -231,7 +237,11 @@ int EventTouch::doAction(void* _main)
 	CPoint pt;
 	pt.x = tx;
 	pt.y = ty;
-	main->rectDlg->drawingPoint(pt, TRUE);
+
+	if(main->IsIconic())
+		main->viewer->viewerRectDlg->drawingPoint(pt, TRUE);
+	else
+		main->rectDlg->drawingPoint(pt, TRUE);
 	//main->rectDlg->OnLButtonUp(0, pt);
 
 	if(isDrag)

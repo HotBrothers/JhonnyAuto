@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ViewerRectDlg.h"
+#include "CBitmapButtonTrans.h"
+#include "ColorStatic.h"
 
 // ViewerDlg dialog
 
@@ -19,12 +22,20 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	
+	ViewerRectDlg* viewerRectDlg;
 	virtual BOOL OnInitDialog();
 	HTHUMBNAIL thumbnail;
 	HWND wndTarget;
 	HWND wndMain;
 	RECT returnTargetWindow;
+	bool isPlay;
+	bool isStop;
+
+	CBitmapButtonTrans btnStart;
+	CBitmapButtonTrans btnPause;
+	CBitmapButtonTrans btnStop;
+	CColorStatic stNow;
+	CColorStatic stTotal;
 
 	void setTargetWindow(HWND hWnd){ wndTarget = hWnd;}
 	void setReturnTargetWindow(RECT rect){ returnTargetWindow = rect;}
@@ -32,4 +43,7 @@ public:
 	BOOL doDwmCapture(RECT src);
 //	virtual BOOL DestroyWindow();
 	afx_msg void OnClose();
+	afx_msg void OnMove(int x, int y);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 };

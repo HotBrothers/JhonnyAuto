@@ -4251,7 +4251,7 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 
 			
 			// 이벤트가 실행 중 일때만 실행
-			if(listPlaylist.IsWindowEnabled() == false)
+			//if(listPlaylist.IsWindowEnabled() == false)
 			{
 				RECT rectPos;
 				rectDlg->GetClientRect(&rectPos);

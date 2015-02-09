@@ -185,6 +185,7 @@ BOOL CJhonnyAutoDlg::OnInitDialog()
 	//dlg.setUserPass(_T(GUEST_MODE_ID));
 	AfxGetApp()->m_pMainWnd = &dlg;
 	EndDialog(-1);
+	
 	INT_PTR nResponse = dlg.DoModal();
 	
 

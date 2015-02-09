@@ -54,7 +54,7 @@ BOOL JhonnyRectDlg::OnInitDialog()
 	AdjustWindowRect(&wndRect, WS_OVERLAPPEDWINDOW, FALSE);
 	int reWidth = wndRect.right - wndRect.left;
 	int reHeight = wndRect.bottom - wndRect.top;
-	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, reWidth, reHeight, 0);
+	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, reWidth, reHeight, SWP_NOMOVE);
 
 
 	//this->SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
