@@ -64,6 +64,7 @@ public:
 	TCHAR events[EVENT_SIZE][MAX_PATH];// = {"이미지 터치하기", "이미지 찾기", "반복하기", "기다리기", "터치하기", "키누르기", "이동하기", "돌아가기"};
 	CFont *m_pDlgFont;
 	bool needToSave;
+	bool isPause;
 	int returnIndexMain;
 
 	HCURSOR mh_scope_cursor, mh_prev_cursor; 
@@ -119,7 +120,8 @@ public:
 	//RECT getTargetMainWndGetWndRect();
 	RECT getDlgRectRect();
 
-	
+	void setThreadExit(bool _threadExit) { threadExit = _threadExit; }
+	void setPause(bool _isPause) { isPause = _isPause; }
 	void setUserID(CString _userID){userID = _userID;}
 	void setUserPass(CString _userPass){userPass = _userPass;}
 	CString HttpPostUserTokenBaaS(char* returnData, int length, CString id, CString pass, bool* activated);

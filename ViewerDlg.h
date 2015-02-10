@@ -36,7 +36,16 @@ public:
 	CBitmapButtonTrans btnStop;
 	CColorStatic* stNow;
 	CColorStatic* stTotal;
+//	CListCtrl actionItem;
+	CString strNowNum;
+	CString strTotalNum;
 
+	void doPlay();
+	void doPause();
+	void doStop();
+
+	void setNowNum(CString _strNowNum); 
+	void setNowTotal(CString _strTotalNum); 
 	void setTargetWindow(HWND hWnd){ wndTarget = hWnd;}
 	void setReturnTargetWindow(RECT rect){ returnTargetWindow = rect;}
 	void setMainWindow(HWND hWnd){ wndMain = hWnd;}

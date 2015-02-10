@@ -48,6 +48,7 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	StrCpyW(rootPath, _T(""));
 	screenX = (int)GetSystemMetrics(SM_CXSCREEN);
 	screenY = (int)GetSystemMetrics(SM_CYSCREEN);
+	isPause = false;
 }
 
 JhonnyMain::~JhonnyMain()
@@ -1023,12 +1024,13 @@ void JhonnyMain::playAndStop()
 	CString strLine;
 	if(listPlaylist.IsWindowEnabled())
 	{
+		/*
 		if(IsIconic())
 		{
 			AfxMessageBox(_T("최소화 된 상태에서는 시작할 수 없습니다."));
 			return;
 		}
-
+		*/
 
 
 		rectDlg->setMoveable(false);
@@ -1476,11 +1478,25 @@ void JhonnyMain::playCore()
 {
 	
 	
+	CString temp;
 	CString strLine;
 	int i = startIndex;
 	startIndex = 0;
 	for(; i<actions.size(); i++)
 	{
+		temp.Format(_T("%d"), i+1);
+		if(IsIconic())
+			viewer->setNowNum(temp);
+		while(isPause == true)
+		{
+			Sleep(1000);
+			if(threadExit==true)
+			{
+				isPause = false;
+				break;
+			}
+		}
+
 		if(threadExit==true)
 			break;
 		setListItemFocus(0);
@@ -1630,43 +1646,19 @@ void JhonnyMain::playCore()
 
 		}
 		Sleep(1000);
-		//Sleep(2000);
-
-		/*
-		if(i== listPlaylist.GetItemCount()-1)
-			i = -1;
-		*/
 		
-		/*
-		if(threadExit==true)
-			break;
-		selectItem(&listPlaylist, i);
-		LVITEM lvItem;
-		TTCHAR szBuffer[256];
-		::ZeroMemory(&lvItem, sizeof(lvItem));
-		::ZeroMemory(szBuffer, sizeof(szBuffer));
-
-		lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
-		lvItem.iItem = i;
-		lvItem.pszText = szBuffer;
-		lvItem.cchTextMax = 256;
-		
-		listPlaylist.GetItem(&lvItem);
-
-		OutputDebugString(lvItem.pszText);
-		OutputDebugString("\n");
-		//doEvent(lvItem.pszText);
-		
-		if(i== listPlaylist.GetItemCount()-1)
-			i = -1;
-		Sleep(2000);
-		*/
 
 	}
 
 	if( i == actions.size() && !listPlaylist.IsWindowEnabled())
-		playAndStop();
-	
+	{
+		// error
+		if(IsIconic())
+			viewer->doStop();
+		else
+			playAndStop();
+	}
+	startIndex = 0;
 	
 }
 
@@ -4267,10 +4259,17 @@ void JhonnyMain::OnSysCommand(UINT nID, LPARAM lParam)
 				distance.right = rectPos.right - returnTargetWindowRect.right;
 				distance.bottom = rectPos.bottom - returnTargetWindowRect.bottom;
 
+				CString temp, temp2;
+				temp.Format(_T("%d"), actions.size());
+				temp2.Format(_T("%d"), startIndex+1);
+				
+
 				viewer = new ViewerDlg();
 				viewer->Create(IDD_DIALOG_VIEWER, GetDesktopWindow());
 				viewer->setMainWindow(this->GetSafeHwnd());
 				viewer->setTargetWindow(pTargetMainWindow->GetSafeHwnd());
+				viewer->setNowNum(temp2);
+				viewer->setNowTotal(temp);
 				viewer->CenterWindow();
 				viewer->ShowWindow(SW_SHOW);
 				viewer->doDwmCapture(distance);

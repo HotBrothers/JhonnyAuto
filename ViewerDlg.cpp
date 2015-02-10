@@ -3,17 +3,20 @@
 
 #include "stdafx.h"
 #include "JhonnyAuto.h"
+#include "JhonnyMain.h"
 
 #include "ViewerDlg.h"
 #include "afxdialogex.h"
 #include "MfcUtil.h"
 
-#define BTN_START_ID 15800
-#define BTN_PAUSE_ID 15801
-#define BTN_STOP_ID  15802
+#define BTN_START 15800
+#define BTN_PAUSE 15801
+#define BTN_STOP  15802
+#define LVS_ACTION_ITEM 15901
 
 // ViewerDlg dialog
 
+JhonnyMain* main;
 IMPLEMENT_DYNAMIC(ViewerDlg, CDialogEx)
 
 ViewerDlg::ViewerDlg(CWnd* pParent /*=NULL*/)
@@ -24,6 +27,8 @@ ViewerDlg::ViewerDlg(CWnd* pParent /*=NULL*/)
 	viewerRectDlg = NULL;
 	isPlay = true;
 	isStop = false;
+	strNowNum = _T("1");
+	strTotalNum = _T(" / 1");
 }
 
 ViewerDlg::~ViewerDlg()
@@ -50,6 +55,8 @@ END_MESSAGE_MAP()
 BOOL ViewerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	main = ((JhonnyMain*)AfxGetMainWnd());
+	
 	const int width = 800;
 	const int height = 480;			// capture 450 + player bar 27 + status bar 3				
 	RECT wndRect = {0, 0, width, height};
@@ -57,20 +64,22 @@ BOOL ViewerDlg::OnInitDialog()
 	int reWidth = wndRect.right - wndRect.left;
 	int reHeight = wndRect.bottom - wndRect.top;
 	this->SetWindowPos(&CWnd::wndTopMost, 0, 0, reWidth, reHeight, 0);
+
+
 	
-	btnStart.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_START_ID);
+	btnStart.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_START);
 	btnStart.LoadBitmaps(IDB_BITMAP_PLAY, IDB_BITMAP_PLAY, IDB_BITMAP_PLAY, IDB_BITMAP_PLAY);
 	btnStart.SetHoverBitmapID(IDB_BITMAP_PLAY_ON);  
 	btnStart.SizeToContent();
 	btnStart.ShowWindow(false);
 
-	btnPause.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_PAUSE_ID);
+	btnPause.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(30, 460,50,50), this, BTN_PAUSE);
 	btnPause.LoadBitmaps(IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE, IDB_BITMAP_PAUSE);
 	btnPause.SetHoverBitmapID(IDB_BITMAP_PAUSE_ON);  
 	btnPause.SizeToContent();
 	
 
-	btnStop.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(78, 460,50,50), this, BTN_STOP_ID);
+	btnStop.Create(NULL, WS_CHILD|WS_VISIBLE | BS_OWNERDRAW, CRect(78, 460,50,50), this, BTN_STOP);
 	btnStop.LoadBitmaps(IDB_BITMAP_STOP, IDB_BITMAP_STOP, IDB_BITMAP_STOP, IDB_BITMAP_STOP_INV);
 	btnStop.SetHoverBitmapID(IDB_BITMAP_STOP_ON);  
 	btnStop.SizeToContent();
@@ -81,17 +90,58 @@ BOOL ViewerDlg::OnInitDialog()
 
 	
 	stNow = new CColorStatic();
-	stNow->Create(_T("1111"), WS_CHILD | WS_VISIBLE | SS_RIGHT, CRect(108, 460,138,480), this);
+	stNow->Create(strNowNum, WS_CHILD | WS_VISIBLE | SS_RIGHT, CRect(108, 460,138,480), this);
 	stNow->SetTextColor(RGB(255,255,255)); //Changes the Edit Box text to Blue
     stNow->SetBkColor(RGB(26,26,26));  //By default your background color is the
 
+
 	stTotal = new CColorStatic();
-	stTotal->Create(_T(" / 1432"), WS_CHILD | WS_VISIBLE | SS_LEFT, CRect(138, 460,178,480), this);
+	stTotal->Create(strTotalNum, WS_CHILD | WS_VISIBLE | SS_LEFT, CRect(138, 460,178,480), this);
 	stTotal->SetTextColor(RGB(142,142,142)); //Changes the Edit Box text to Blue
     stTotal->SetBkColor(RGB(26,26,26));  //By default your background color is the
  
+	/*
+	actionItem.Create(WS_CHILD | WS_VISIBLE | LVS_LIST | LVS_SHOWSELALWAYS |LBS_NOTIFY , CRect(188, 455,408,478), this, LVS_ACTION_ITEM);
+	actionItem.InsertColumn(0, _T("¾ÆÀÌÅÛ"), LVCFMT_LEFT, 560);
+	DWORD dwExStyle = actionItem.GetExtendedStyle();
+	actionItem.SetExtendedStyle ( dwExStyle | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP );
+	actionItem.ModifyStyle(0, LVS_NOCOLUMNHEADER);
+
+	actionItem.SetBkColor(CLR_NONE);
+	actionItem.SetTextBkColor(CLR_NONE);
+	actionItem.SetTextBkColor(RGB(255,255,255));
+	actionItem.SetImageList(&main->imglist, LVSIL_NORMAL);
+	actionItem.SetImageList(&main->imglist, LVSIL_SMALL);
 	
 	
+	int index = _ttoi(strNowNum)-1;
+	actionItem.DeleteAllItems();
+	LVITEM lvItem;
+	TCHAR szBuffer[512];
+	::ZeroMemory(&lvItem, sizeof(lvItem));
+	::ZeroMemory(szBuffer, sizeof(szBuffer));
+
+	lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
+	//lvItem.mask = LVIF_TEXT ;
+	lvItem.iItem = index;
+	lvItem.pszText = szBuffer;
+	lvItem.cchTextMax = 512;
+	//main->listPlaylist.GetItem(&lvItem);
+	actionItem.InsertItem(&lvItem);
+	*/
+
+	/*
+	//TTCHAR szBuffer[256];
+	::ZeroMemory(&lvItem, sizeof(lvItem));
+	//::ZeroMemory(szBuffer, sizeof(szBuffer));
+	lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
+		
+	lvItem.iItem = index;
+	lvItem.iImage = index;
+	lvItem.pszText = main->events[index];
+	lvItem.cchTextMax = MAX_PATH;
+	actionItem.InsertItem(&lvItem);
+	*/
 	return TRUE;
 
 }
@@ -223,34 +273,97 @@ BOOL ViewerDlg::OnEraseBkgnd(CDC* pDC)
 	return CDialogEx::OnEraseBkgnd(pDC);
 }
 
+void ViewerDlg::doPlay()
+{
+	btnStart.ShowWindow(FALSE);
+	btnPause.ShowWindow(TRUE);
+	btnStop.EnableWindow(true);
+	btnPause.RedrawWindow();
+	if(isStop == true)
+		main->playAndStop();
+	else      // is Pause
+		main->setPause(false);
+			
+	isStop = false;
+	isPlay = true;
+
+}
+
+void ViewerDlg::doPause()
+{
+	btnStart.ShowWindow(TRUE);
+	btnPause.ShowWindow(FALSE);
+	btnStart.RedrawWindow();
+	isPlay = false;
+	main->setPause(true);
+	
+}
+
+void ViewerDlg::doStop()
+{
+	btnStop.EnableWindow(false);
+	btnPause.ShowWindow(FALSE);
+	btnStart.ShowWindow(TRUE);
+	btnStart.RedrawWindow();
+	
+
+	isStop = true;
+	isPlay = false;
+	main->playAndStop();
+	
+}
 
 BOOL ViewerDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	 if (HIWORD(wParam) == BN_CLICKED) 
-    { 
-         switch (LOWORD(wParam))    // Button ID 
-         { 
-             case BTN_START_ID: 
-				btnStart.ShowWindow(FALSE);
-				btnPause.ShowWindow(TRUE);
-				btnStop.EnableWindow(true);
-				isStop = false;
-				isPlay = true;
-				break; 
-			case BTN_PAUSE_ID: 
-				btnStart.ShowWindow(TRUE);
-				btnPause.ShowWindow(FALSE);
-				isPlay = false;
-				break;
-			case BTN_STOP_ID: 
-				btnStop.EnableWindow(false);
-				btnStart.ShowWindow(TRUE);
-				btnPause.ShowWindow(FALSE);
-				isStop = true;
-				isPlay = false;
-				break;
-         } 
-    } 
+	if (HIWORD(wParam) == BN_CLICKED) 
+	{ 
+		switch (LOWORD(wParam))    // Button ID 
+		{ 
+		case BTN_START: 
+			doPlay();
+			break; 
+		case BTN_PAUSE: 
+			doPause();
+			break;
+		case BTN_STOP: 
+			doStop();
+			break;
+		} 
+	} 
+	//Invalidate();
 	return CDialogEx::OnCommand(wParam, lParam);
+}
+
+
+void ViewerDlg::setNowNum(CString _strNowNum)
+{ 
+	int index = _ttoi(strNowNum)-1;
+	strNowNum = _strNowNum;
+	if(stNow!=NULL) 
+		stNow->SetWindowTextW(strNowNum);
+
+	LVITEM lvItem;
+	TCHAR szBuffer[512];
+	::ZeroMemory(&lvItem, sizeof(lvItem));
+	::ZeroMemory(szBuffer, sizeof(szBuffer));
+
+	//lvItem.mask = LVIF_TEXT;
+	lvItem.mask = LVIF_TEXT | LVIF_IMAGE;
+	lvItem.iItem = index;
+	lvItem.pszText = szBuffer;
+	lvItem.cchTextMax = 512;
+	main->listPlaylist.GetItem(&lvItem);
+	lvItem.iItem = 0;
+	//actionItem.SetItem(&lvItem);
+	//actionItem.RedrawItems(0, actionItem.GetItemCount());
+	
+}
+void ViewerDlg::setNowTotal(CString _strTotalNum)
+{ 
+	CString temp;
+	strTotalNum = _strTotalNum; 
+	temp = _T(" / ") + strTotalNum;
+	if(stTotal!=NULL) 
+		stTotal->SetWindowTextW(temp);
 }
