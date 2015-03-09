@@ -17,7 +17,7 @@
 using namespace std;
 
 BOOL Capture(HWND hTargetWnd, LPCTSTR lpszFilePath);
-CString GetFileVersion();
+//CString GetFileVersion();
 bool compareObj( EventAction* first, EventAction* second );
 
 
@@ -49,6 +49,7 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	screenX = (int)GetSystemMetrics(SM_CXSCREEN);
 	screenY = (int)GetSystemMetrics(SM_CYSCREEN);
 	isPause = false;
+	parse = new ParseAPI();
 }
 
 JhonnyMain::~JhonnyMain()
@@ -4378,42 +4379,6 @@ bool compareObj( EventAction* first, EventAction* second )
 
 
 
-CString GetFileVersion()
-{
-    CString strVersion = _T("");
-    HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(VS_VERSION_INFO), RT_VERSION);
-    if (hRsrc != NULL)
-    {
-        HGLOBAL hGlobalMemory = LoadResource(NULL, hRsrc);
-        if (hGlobalMemory != NULL)
-        {
-            CString rVersion;
-            LPVOID pVersionResouece = LockResource(hGlobalMemory);
-            LPVOID pVersion = NULL;
-            DWORD uLength,langD;
-            BOOL retVal;
-            retVal = VerQueryValue(pVersionResouece, _T("\\VarFileInfo\\Translation"), (LPVOID*)&pVersion, (UINT*)&uLength);
-            if (retVal && uLength == 4) 
-            {
-                memcpy(&langD,pVersion,4); 
-                rVersion.Format(_T("\\StringFileInfo\\%02X%02X%02X%02X\\FileVersion"),
-                    (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, 
-                    (langD & 0xff0000)>>16);
-            }
-            else
-            {
-                rVersion.Format(_T("\\StringFileInfo\\%04X04B0\\FileVersion"), GetUserDefaultLangID());
-            }
-            if( VerQueryValue(pVersionResouece, rVersion.GetBuffer(0), (LPVOID*)&pVersion, (UINT *)&uLength) != 0 )
-            {
-                strVersion.Format(_T("%s"), pVersion);
-            }
-        }
-        FreeResource(hGlobalMemory);
-    }
-    return strVersion;
-}
-
 
 int JhonnyMain::HttpGetJhonnyVersionBaaS(TCHAR* noticeInput, TCHAR* versionInput)
  {
@@ -4490,6 +4455,7 @@ int JhonnyMain::HttpGetJhonnyVersionBaaS(TCHAR* noticeInput, TCHAR* versionInput
 	BOOL bRet = InternetCloseHandle(hOpenRequest);
 	bRet = InternetCloseHandle(hInternetConnect);
 	bRet = InternetCloseHandle(hInternetRoot);
+	/*
 	CString clientVersion = GetFileVersion();
 	OutputDebugString(clientVersion);
 	OutputDebugString(_T("\n"));
@@ -4503,7 +4469,7 @@ int JhonnyMain::HttpGetJhonnyVersionBaaS(TCHAR* noticeInput, TCHAR* versionInput
 		OutputDebugString( _T("구버전 입니다.\n"));
 		return -1;
 	}
-
+	*/
 
 	return 0;
  }

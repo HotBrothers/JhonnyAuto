@@ -6,7 +6,6 @@
 #include "JhonnyAuto.h"
 #include "JhonnyAutoDlg.h"
 #include "afxdialogex.h"
-#include "JhonnyMain.h"
 #include "JhonnySignUp.h"
 
 #include <fstream>  
@@ -18,6 +17,7 @@
 using namespace std;
 
 
+CString GetFileVersion();
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
 class CAboutDlg : public CDialogEx
@@ -63,9 +63,74 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 
 	isStarted = false;
 	// TODO: Add your message handler code here and/or call default
-	TCHAR notice[2048]=_T("");
-	TCHAR version[64] =_T("");
-	JhonnyMain dlg;
+	//TCHAR notice[2048]=_T("");
+	//TCHAR version[64] =_T("");
+	
+	
+	const CString tokenizerVersion = L"\"updateVersion\":";
+	const CString tokenizerContent = L"\"updateContent\":";
+	CString data;
+	CString version;
+	CString content;
+
+	if(dlg.parse->getData(&data, VERSION) == 0)
+	{
+		int idx = data.Find(tokenizerVersion);
+		version = data.Mid(idx + tokenizerVersion.GetLength() + 1);
+		idx = version.Find(_T("\""));
+		version = version.Left(idx);
+		OutputDebugString(version);
+		OutputDebugString(_T("\n"));
+		
+		idx = data.Find(tokenizerContent);
+		content = data.Mid(idx + tokenizerContent.GetLength() + 1);
+		idx = content.Find(_T("\""));
+		content = content.Left(idx);
+		content.Replace(L"\\n", L"\n"); 
+		OutputDebugString(content);
+		OutputDebugString(_T("\n"));
+
+		CString clientVersion = GetFileVersion();
+		OutputDebugString(clientVersion);
+		OutputDebugString(_T("\n"));
+		if ( version.Compare(clientVersion) == 0 ) 
+		{
+			OutputDebugString( _T("최신버전 입니다.\n"));
+			
+		}
+		else
+		{
+			OutputDebugString( _T("구버전 입니다.\n"));
+
+			CString message = _T("현재 사용하시는 버전은 구버전 입니다.\n최신 버전을 다운 받으시겠습니까?\n\n\n");
+
+			message += _T("현재 버전 : ");
+			message += clientVersion;
+			message += _T("\n업데이트 버전 : ");
+			message += version;
+			message += _T("\n\n[업데이트 내용]\n");
+			message += content;
+			/*
+			StrCatW(message, _T("Version : "));
+			StrCatW(message, version);
+			StrCatW(message, _T("\n\n[업데이트 내용]\n"));
+			StrCatW(message, notice);
+			StrCatW(message, _T("\n\0"));
+			*/
+			if(IDYES == AfxMessageBox(message, MB_YESNO )) 
+			{
+				const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/75");
+				::ShellExecute(NULL, _T("open"), helpUrl, NULL, NULL, SW_SHOW);
+				EndDialog(-1);
+				return ;
+			}
+			
+		}
+	}
+	
+	
+
+	/*
 	if(dlg.HttpGetJhonnyVersionBaaS(notice, version) != 0)
 	{
 		TCHAR message[2048] = _T("현재 사용하시는 버전은 구버전 입니다.\n최신 버전을 다운 받으시겠습니까?\n\n\n");
@@ -84,6 +149,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 			return ;
 		}
 	}
+	*/
 }
 
 void CJhonnyAutoDlg::DoDataExchange(CDataExchange* pDX)
@@ -177,7 +243,7 @@ BOOL CJhonnyAutoDlg::OnInitDialog()
 	  m_ToolTip.Activate(TRUE);
 	}
 	
-	
+	/*
 	JhonnyMain dlg;
 	dlg.setUserID(_T("betatest"));
 	dlg.setUserPass(_T("betatest"));
@@ -187,7 +253,7 @@ BOOL CJhonnyAutoDlg::OnInitDialog()
 	EndDialog(-1);
 	
 	INT_PTR nResponse = dlg.DoModal();
-	
+	*/
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -249,12 +315,19 @@ void CJhonnyAutoDlg::OnBnClickedOk()
 
 
 	UpdateData();
-	JhonnyMain dlg;
 	
-	
+	 
 	
 	char szBuf[512] = "";
 	bool isActvated = false;
+
+	int len = 256;
+	char loginPass[256]={0,};
+ 
+	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(editLogin), len, loginPass, editLogin.GetLength(), NULL, NULL);
+	
+
+	int result22 = dlg.parse->signIn(loginPass, loginPass);
 	CString result = dlg.HttpPostUserTokenBaaS(szBuf, 512, editLogin, editPass, &isActvated);
 	if( isActvated == false)
 	{
@@ -401,4 +474,44 @@ void CJhonnyAutoDlg::OnStnClickedStaticSignup()
 		TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
 	}
 	*/
+}
+
+
+
+
+
+CString GetFileVersion()
+{
+    CString strVersion = _T("");
+    HRSRC hRsrc = FindResource(NULL, MAKEINTRESOURCE(VS_VERSION_INFO), RT_VERSION);
+    if (hRsrc != NULL)
+    {
+        HGLOBAL hGlobalMemory = LoadResource(NULL, hRsrc);
+        if (hGlobalMemory != NULL)
+        {
+            CString rVersion;
+            LPVOID pVersionResouece = LockResource(hGlobalMemory);
+            LPVOID pVersion = NULL;
+            DWORD uLength,langD;
+            BOOL retVal;
+            retVal = VerQueryValue(pVersionResouece, _T("\\VarFileInfo\\Translation"), (LPVOID*)&pVersion, (UINT*)&uLength);
+            if (retVal && uLength == 4) 
+            {
+                memcpy(&langD,pVersion,4); 
+                rVersion.Format(_T("\\StringFileInfo\\%02X%02X%02X%02X\\FileVersion"),
+                    (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, 
+                    (langD & 0xff0000)>>16);
+            }
+            else
+            {
+                rVersion.Format(_T("\\StringFileInfo\\%04X04B0\\FileVersion"), GetUserDefaultLangID());
+            }
+            if( VerQueryValue(pVersionResouece, rVersion.GetBuffer(0), (LPVOID*)&pVersion, (UINT *)&uLength) != 0 )
+            {
+                strVersion.Format(_T("%s"), pVersion);
+            }
+        }
+        FreeResource(hGlobalMemory);
+    }
+    return strVersion;
 }

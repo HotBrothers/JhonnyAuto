@@ -4,6 +4,7 @@
 
 #pragma once
 #include "JhonnyAdware.h"
+#include "JhonnyMain.h"
 #include "afxwin.h"
 
 // CJhonnyAutoDlg 대화 상자
@@ -19,6 +20,7 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 	JhonnyAdware adware;
+	JhonnyMain dlg;
 
 // 구현입니다.
 protected:

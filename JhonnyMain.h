@@ -11,6 +11,8 @@
 #include "JhonnyRunItem.h"
 #include "JhonnyRegister.h"
 #include "JhonnyAbout.h"
+
+#include "ParseAPI.h"
 #include "MfcUtil.h"
 
 #include "zip.h"
@@ -68,6 +70,8 @@ public:
 	int returnIndexMain;
 
 	HCURSOR mh_scope_cursor, mh_prev_cursor; 
+
+	ParseAPI* parse;
 
 	int startIndex;
 	int nIndexLeftSel;
