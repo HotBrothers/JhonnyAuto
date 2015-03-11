@@ -318,16 +318,65 @@ void CJhonnyAutoDlg::OnBnClickedOk()
 	
 	 
 	
-	char szBuf[512] = "";
-	bool isActvated = false;
 
-	int len = 256;
+	char loginID[256]={0,};
 	char loginPass[256]={0,};
- 
-	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(editLogin), len, loginPass, editLogin.GetLength(), NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(editLogin), 256, loginID, editLogin.GetLength(), NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(editPass), 256, loginPass, editPass.GetLength(), NULL, NULL);
 	
 
-	int result22 = dlg.parse->signIn(loginPass, loginPass);
+	int result = dlg.parse->signIn(loginID, loginPass);
+	if(result == 0)
+	{
+		dlg.setUserID(editLogin);
+		dlg.setUserPass(editPass);
+		//dlg.HttpGetBaaS(
+		AfxGetApp()->m_pMainWnd = &dlg;
+		EndDialog(-1);
+		
+		INT_PTR nResponse = dlg.DoModal();
+
+		if (nResponse == IDOK)
+		{
+			// TODO: 여기에 [확인]을 클릭하여 대화 상자가 없어질 때 처리할
+			//  코드를 배치합니다.
+		}
+		else if (nResponse == IDCANCEL)
+		{
+			// TODO: 여기에 [취소]를 클릭하여 대화 상자가 없어질 때 처리할
+			//  코드를 배치합니다.
+		}
+		else if (nResponse == -1)
+		{
+			TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 응용 프로그램이 예기치 않게 종료됩니다.\n");
+			TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
+		}
+	}
+	else
+	{
+		
+		///////////////////////////////////
+		// 베타테스트기간 강제 인증 
+		dlg.setUserID(_T("betatest"));
+		dlg.setUserPass(_T("betatest"));
+		AfxGetApp()->m_pMainWnd = &dlg;
+		EndDialog(-1);
+		INT_PTR nResponse = dlg.DoModal();
+		///////////////////////////////////
+		
+		
+		
+		if(IDYES == AfxMessageBox(_T("로그인에 실패하였습니다.\n기능 제한모드로 실행 하시겠습니까?"),MB_YESNO )) 
+		{
+			dlg.setUserID(_T(GUEST_MODE_ID));
+			dlg.setUserPass(_T(GUEST_MODE_ID));
+			AfxGetApp()->m_pMainWnd = &dlg;
+			EndDialog(-1);
+			INT_PTR nResponse = dlg.DoModal();
+		}
+	}
+
+	/*
 	CString result = dlg.HttpPostUserTokenBaaS(szBuf, 512, editLogin, editPass, &isActvated);
 	if( isActvated == false)
 	{
@@ -342,7 +391,7 @@ void CJhonnyAutoDlg::OnBnClickedOk()
 		AfxGetApp()->m_pMainWnd = &dlg;
 		EndDialog(-1);
 		INT_PTR nResponse = dlg.DoModal();
-		/*
+		
 		if(IDYES == AfxMessageBox(_T("로그인에 실패하였습니다.\n기능 제한모드로 실행 하시겠습니까?"),MB_YESNO )) 
 		{
 			dlg.setUserID(_T(GUEST_MODE_ID));
@@ -351,7 +400,7 @@ void CJhonnyAutoDlg::OnBnClickedOk()
 			EndDialog(-1);
 			INT_PTR nResponse = dlg.DoModal();
 		}
-		*/
+		
 	}
 	else
 	{
@@ -379,7 +428,7 @@ void CJhonnyAutoDlg::OnBnClickedOk()
 			TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
 		}
 	}
-	
+	*/
 }
 
 

@@ -1633,17 +1633,23 @@ void JhonnyMain::playCore()
 		{
 			pcounter = 0;
 
-			char szBuf[512] = "";
-			CString result =_T("fail");
-			result = HttpPostUserTokenBaaS(szBuf, 512, userID, userPass, NULL);
-			int com = result.Compare(_T("fail"));
-			if(com == 0)
+			
+
+			char loginID[256]={0,};
+			char loginPass[256]={0,};
+			WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(userID), 256, loginID, userID.GetLength(), NULL, NULL);
+			WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(userPass), 256, loginPass, userPass.GetLength(), NULL, NULL);
+
+			int result = parse->signIn(loginID, loginPass);
+			
+			if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
+				setGeustMode(true);
+			else if(result != 0)
 			{
 				AfxMessageBox(_T("Network Error:\n인증되지 않은 아이디 또는 비밀번호입니다.\n프로그램을 종료합니다."));
 				EndDialog(-1);
 			}
-			if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
-				setGeustMode(true);
+			
 
 		}
 		Sleep(1000);
