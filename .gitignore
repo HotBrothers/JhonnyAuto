@@ -53,6 +53,7 @@ opencv/
 opencv_static/
 zlib/
 zllib_static/
+curl/
 
 # Objects
 *.obj
@@ -72,5 +73,4 @@ ipch/
 *.lastbuildstate
 *.pch
 *.pdb
-
 

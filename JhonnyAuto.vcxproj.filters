@@ -126,6 +126,12 @@
     <ClInclude Include="ColorStatic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParseAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageComparator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JhonnyAuto.cpp">
@@ -228,6 +234,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColorStatic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParseAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
