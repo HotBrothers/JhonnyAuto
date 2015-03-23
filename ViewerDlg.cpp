@@ -29,6 +29,7 @@ ViewerDlg::ViewerDlg(CWnd* pParent /*=NULL*/)
 	isStop = false;
 	strNowNum = _T("1");
 	strTotalNum = _T(" / 1");
+	strItemName = _T("");
 }
 
 ViewerDlg::~ViewerDlg()
@@ -99,6 +100,12 @@ BOOL ViewerDlg::OnInitDialog()
 	stTotal->Create(strTotalNum, WS_CHILD | WS_VISIBLE | SS_LEFT, CRect(138, 460,178,480), this);
 	stTotal->SetTextColor(RGB(142,142,142)); //Changes the Edit Box text to Blue
     stTotal->SetBkColor(RGB(26,26,26));  //By default your background color is the
+
+	
+	stItemName = new CColorStatic();
+	stItemName->Create(strItemName, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_WORDELLIPSIS, CRect(198, 460,800,480), this);
+	stItemName->SetTextColor(RGB(236,196,70)); //Changes the Edit Box text to Blue
+    stItemName->SetBkColor(RGB(26,26,26));  //By default your background color is the
  
 	/*
 	actionItem.Create(WS_CHILD | WS_VISIBLE | LVS_LIST | LVS_SHOWSELALWAYS |LBS_NOTIFY , CRect(188, 455,408,478), this, LVS_ACTION_ITEM);
@@ -258,7 +265,7 @@ BOOL ViewerDlg::OnEraseBkgnd(CDC* pDC)
 	CRect rect;
     GetClientRect(&rect);
     CBrush myBrush(RGB(26, 26, 26));    // dialog background color <- 요기 바꾸면 됨.
-	CBrush myBrush2(RGB(119, 119, 119));    // dialog background color <- 요기 바꾸면 됨.
+	CBrush myBrush2(RGB(236,196,70));    // dialog background color <- 요기 바꾸면 됨.
     CBrush *pOld = pDC->SelectObject(&myBrush);
 	
 
@@ -338,8 +345,9 @@ BOOL ViewerDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void ViewerDlg::setNowNum(CString _strNowNum)
 { 
-	int index = _ttoi(strNowNum)-1;
+	
 	strNowNum = _strNowNum;
+	int index = _ttoi(_strNowNum)-1;
 	if(stNow!=NULL) 
 		stNow->SetWindowTextW(strNowNum);
 
@@ -355,10 +363,17 @@ void ViewerDlg::setNowNum(CString _strNowNum)
 	lvItem.cchTextMax = 512;
 	main->listPlaylist.GetItem(&lvItem);
 	lvItem.iItem = 0;
+
+	strItemName.Format(_T("%s"), szBuffer);
+	if(stItemName!=NULL)
+	{
+		stItemName->SetWindowTextW(strItemName);
+	}
 	//actionItem.SetItem(&lvItem);
 	//actionItem.RedrawItems(0, actionItem.GetItemCount());
 	
 }
+
 void ViewerDlg::setNowTotal(CString _strTotalNum)
 { 
 	CString temp;
@@ -367,3 +382,5 @@ void ViewerDlg::setNowTotal(CString _strTotalNum)
 	if(stTotal!=NULL) 
 		stTotal->SetWindowTextW(temp);
 }
+
+

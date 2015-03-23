@@ -194,8 +194,24 @@ int EventLoop::doReset()
 // 기다리기
 int EventWait::doAction(void* _main)
 {
-	eventLog.Format(_T("[대기] : %d초 대기"), (int)(millisec/1000));
-	Sleep(millisec);
+	int sec = (int)(millisec/1000);
+	eventLog.Format(_T("[대기] : %d초 대기"), sec);
+	
+
+	JhonnyMain* main = (JhonnyMain*)_main;
+	for(int i=0; i<sec; i++)
+	{
+
+		while(main->isPause == true)
+		{
+			Sleep(1000);
+			if(main->threadExit==true)
+			{
+				return 0;
+			}
+		}
+		Sleep(1000);	
+	}
 	return 0;
 }
 

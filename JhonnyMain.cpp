@@ -1589,6 +1589,7 @@ void JhonnyMain::playCore()
 		
 		
 		strLine=_T("");
+		strLine.Format(_T("%d. "), i+1);
 		strLine.Append(actions.at(i)->eventLog);
 		strLine.Append(_T("\r\n"));
 		logData.Append(getLogTime());

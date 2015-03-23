@@ -73,6 +73,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 	CString version;
 	CString content;
 
+	/*
 	if(dlg.parse->getData(&data, VERSION) == 0)
 	{
 		int idx = data.Find(tokenizerVersion);
@@ -110,13 +111,6 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 			message += version;
 			message += _T("\n\n[업데이트 내용]\n");
 			message += content;
-			/*
-			StrCatW(message, _T("Version : "));
-			StrCatW(message, version);
-			StrCatW(message, _T("\n\n[업데이트 내용]\n"));
-			StrCatW(message, notice);
-			StrCatW(message, _T("\n\0"));
-			*/
 			if(IDYES == AfxMessageBox(message, MB_YESNO )) 
 			{
 				const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/75");
@@ -127,7 +121,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 			
 		}
 	}
-	
+	*/
 	
 
 	/*
@@ -243,7 +237,7 @@ BOOL CJhonnyAutoDlg::OnInitDialog()
 	  m_ToolTip.Activate(TRUE);
 	}
 	
-	/*
+	
 	JhonnyMain dlg;
 	dlg.setUserID(_T("betatest"));
 	dlg.setUserPass(_T("betatest"));
@@ -253,7 +247,7 @@ BOOL CJhonnyAutoDlg::OnInitDialog()
 	EndDialog(-1);
 	
 	INT_PTR nResponse = dlg.DoModal();
-	*/
+	
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }

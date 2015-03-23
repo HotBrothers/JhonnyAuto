@@ -36,9 +36,11 @@ public:
 	CBitmapButtonTrans btnStop;
 	CColorStatic* stNow;
 	CColorStatic* stTotal;
+	CColorStatic* stItemName;
 //	CListCtrl actionItem;
 	CString strNowNum;
 	CString strTotalNum;
+	CString strItemName;
 
 	void doPlay();
 	void doPause();
