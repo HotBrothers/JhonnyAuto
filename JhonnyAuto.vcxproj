@@ -129,6 +129,7 @@
     <ClInclude Include="JhonnyItem.h" />
     <ClInclude Include="JhonnyLoadingDlg.h" />
     <ClInclude Include="JhonnyMain.h" />
+    <ClInclude Include="JhonnyOptionDlg.h" />
     <ClInclude Include="JhonnyRecpAuth.h" />
     <ClInclude Include="JhonnyRectDlg.h" />
     <ClInclude Include="JhonnyRegister.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="JhonnyItem.cpp" />
     <ClCompile Include="JhonnyLoadingDlg.cpp" />
     <ClCompile Include="JhonnyMain.cpp" />
+    <ClCompile Include="JhonnyOptionDlg.cpp" />
     <ClCompile Include="JhonnyRecpAuth.cpp" />
     <ClCompile Include="JhonnyRectDlg.cpp" />
     <ClCompile Include="JhonnyRegister.cpp" />

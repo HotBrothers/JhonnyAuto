@@ -106,6 +106,7 @@ BEGIN_MESSAGE_MAP(JhonnyMain, CDialogEx)
 	ON_WM_HOTKEY()
 	ON_COMMAND(ID_MENU_LOG_SAVE, &JhonnyMain::OnMenuLogSave)
 	ON_WM_SYSCOMMAND()
+	ON_COMMAND(ID_MENU_OPTION, &JhonnyMain::OnMenuOption)
 END_MESSAGE_MAP()
 
 
@@ -3932,6 +3933,15 @@ void JhonnyMain::OnMenuInfo()
 
 
 
+void JhonnyMain::OnMenuOption()
+{
+	// TODO: Add your command handler code here
+	JhonnyOptionDlg dlgOption;
+	if(dlgOption.DoModal()==IDOK)
+	{
+
+	}
+}
 
 
 
@@ -4674,3 +4684,4 @@ RECT JhonnyMain::getTargetMainWndGetWndRect()
 
 }
 */
+

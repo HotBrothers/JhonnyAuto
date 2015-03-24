@@ -142,4 +142,14 @@ public:
 
 		return cv::compareHist(refH,inputH,CV_COMP_BHATTACHARYYA);
 	}
+
+	double compare (const cv::Mat& image1, const cv::Mat& image2) {
+
+		reference= hist.colorReduce(image1,div);
+		refH= hist.getHistogram(reference);
+		input= hist.colorReduce(image2,div);
+		inputH= hist.getHistogram(input);
+
+		return cv::compareHist(refH,inputH,CV_COMP_BHATTACHARYYA);
+	}
 };

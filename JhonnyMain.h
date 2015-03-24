@@ -11,6 +11,7 @@
 #include "JhonnyRunItem.h"
 #include "JhonnyRegister.h"
 #include "JhonnyAbout.h"
+#include "JhonnyOptionDlg.h"
 
 #include "ParseAPI.h"
 #include "MfcUtil.h"
@@ -152,6 +153,12 @@ public:
 	int saveListItems(CString* log);
 	BOOL refreshGoToLink();
 
+	// 옵션 변수들
+	float optDelay;
+
+
+
+
 	int getFiles(TCHAR* path, TCHAR* extensionType, std::vector<TCHAR*>* fileList);
 	BOOL deleteDir(CString dir);
 	std::string TCHARToString(const TCHAR* ptsz);
@@ -217,4 +224,5 @@ public:
 	void saveTextFile(TCHAR* infoDest, TCHAR* id);
 	afx_msg void OnMenuLogSave();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnMenuOption();
 };
