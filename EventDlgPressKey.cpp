@@ -96,10 +96,16 @@ BOOL EventDlgPressKey::OnInitDialog()
 BOOL EventDlgPressKey::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
+	if(pMsg->wParam == VK_RETURN)
 	{
 		hotkeyKey.SetHotKey(VK_RETURN, NULL);
 		return FALSE;
 	}
+	else if(pMsg->wParam == VK_ESCAPE)
+	{
+		hotkeyKey.SetHotKey(VK_ESCAPE, NULL);
+		return FALSE;
+	}
+
 	return CDialogEx::PreTranslateMessage(pMsg);
 }

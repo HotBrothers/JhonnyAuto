@@ -63,6 +63,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	CString appEnvironmentPath;
 	int screenX, screenY;
 	TCHAR events[EVENT_SIZE][MAX_PATH];// = {"이미지 터치하기", "이미지 찾기", "반복하기", "기다리기", "터치하기", "키누르기", "이동하기", "돌아가기"};
 	CFont *m_pDlgFont;
@@ -155,9 +156,11 @@ public:
 
 	// 옵션 변수들
 	float optDelay;
-
-
-
+	
+	WORD optVk;
+	WORD optMod;
+	int loadOption();
+	int saveOption();
 
 	int getFiles(TCHAR* path, TCHAR* extensionType, std::vector<TCHAR*>* fileList);
 	BOOL deleteDir(CString dir);

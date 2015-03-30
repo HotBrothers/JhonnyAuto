@@ -50,7 +50,24 @@ JhonnyMain::JhonnyMain(CWnd* pParent /*=NULL*/)
 	screenY = (int)GetSystemMetrics(SM_CYSCREEN);
 	isPause = false;
 	parse = new ParseAPI();
+
+	// 환경설정
+	TCHAR path[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path)))
+	{
+		StrCatW(path,_T("\\HotBrothers"));
+		CreateDirectory(path, NULL);
+		StrCatW(path,_T("\\JhonnyMacro"));
+		CreateDirectory(path, NULL);
+	}
+
+
+	appEnvironmentPath = path;
+	appEnvironmentPath += _T("\\");
+	loadOption();
+	
 }
+
 
 JhonnyMain::~JhonnyMain()
 {
@@ -64,6 +81,7 @@ JhonnyMain::~JhonnyMain()
                            szTempFileName); // buffer for path 
 	SetCurrentDirectory(szTempFileName);
 	RemoveDirectory(rootPath);
+	UnregisterHotKey(GetSafeHwnd(), hotKeyID);
 	if(m_pDlgFont != NULL)
 		delete m_pDlgFont;
 }
@@ -119,6 +137,9 @@ BOOL JhonnyMain::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 
+	
+
+
 	srand((unsigned int)time(NULL));
 	CFileFind pFind;
 	BOOL bRet; 
@@ -145,10 +166,14 @@ BOOL JhonnyMain::OnInitDialog()
 	StrCpyW(listItemDirName, _T("data\\listitem"));
 	StrCpyW(runItemDirName, _T("data\\runitem"));
 	StrCpyW(appSaveFilePath, _T(""));
+
+	
 	
 	
 	HANDLE hFile     = INVALID_HANDLE_VALUE;
     DWORD dwRetVal = 0;
+
+	
     TCHAR szTempFileName[MAX_PATH];  
 	dwRetVal = GetTempPath(MAX_PATH,          // length of the buffer
                            szTempFileName); // buffer for path 
@@ -300,8 +325,12 @@ BOOL JhonnyMain::OnInitDialog()
 	// 16 : 9
 	
 	//rectDlg->MoveWindow(0, 0, SEARCH_RECT_WIDTH + GetSystemMetrics(SM_CXEDGE)*8, SEARCH_RECT_HEGIHT + GetSystemMetrics(SM_CYCAPTION) +  GetSystemMetrics(SM_CYEDGE)*8);
+	CRect rectRT;
 	rectDlg->CenterWindow();
-	
+	rectDlg->GetWindowRect(&rectRT);
+	rectRT.top -= 40;
+	rectDlg->SetWindowPos(NULL, rectRT.left, rectRT.top, 0, 0, SWP_NOSIZE);
+
 	rectDlg->ShowWindow(SW_SHOW);
 	
 	
@@ -319,7 +348,7 @@ BOOL JhonnyMain::OnInitDialog()
 
 	hotKeyID = ::GlobalAddAtom(_T("jhonnyHotkey"));
 
-	if(!::RegisterHotKey(GetSafeHwnd(), hotKeyID, NULL, VK_F4))   // 추가
+	if(!::RegisterHotKey(GetSafeHwnd(), hotKeyID, optMod, optVk))   // 추가
 		AfxMessageBox(_T("핫키 등록 실패"));                                  // 추가
 	
 	if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
@@ -1036,6 +1065,18 @@ void JhonnyMain::playAndStop()
 
 
 		rectDlg->setMoveable(false);
+
+		if(IsWindow(this->GetSafeHwnd()))
+		{
+		
+			setTargetMainWndFromRectDlg();
+			/*
+			if(((JhonnyMain*)main)->pTargetMainWindow == ((JhonnyMain*)main))
+				return ;
+				*/
+		}
+
+
 		
 		POSITION listItemPos = listPlaylist.GetFirstSelectedItemPosition();
 		int listItemIndex = listPlaylist.GetNextSelectedItem(listItemPos);
@@ -1052,7 +1093,7 @@ void JhonnyMain::playAndStop()
 		
 		listEvents.EnableWindow(false);
 		listPlaylist.EnableWindow(false);
-		btnStart.SetWindowText(_T("중지하기 (F4)"));
+		btnStart.SetWindowText(_T("중지하기"));
 		
 		strLine.Format(_T("프로그램이 시작되었습니다.\r\n"));
 		logData.Append(getLogTime());
@@ -1079,7 +1120,7 @@ void JhonnyMain::playAndStop()
 		
 		listEvents.EnableWindow(true);
 		listPlaylist.EnableWindow(true);
-		btnStart.SetWindowText(_T("시작하기 (F4)"));
+		btnStart.SetWindowText(_T("시작하기"));
 		
 		strLine.Format(_T("프로그램이 중지되었습니다.\r\n"));
 		logData.Append(getLogTime());
@@ -1648,13 +1689,13 @@ void JhonnyMain::playCore()
 				setGeustMode(true);
 			else if(result != 0)
 			{
-				AfxMessageBox(_T("Network Error:\n인증되지 않은 아이디 또는 비밀번호입니다.\n프로그램을 종료합니다."));
+				AfxMessageBox(_T("Network Error(Parse):\n인증되지 않은 아이디 또는 비밀번호입니다.\n프로그램을 종료합니다."));
 				EndDialog(-1);
 			}
 			
 
 		}
-		Sleep(1000);
+		Sleep(optDelay*1000);
 		
 
 	}
@@ -3937,9 +3978,22 @@ void JhonnyMain::OnMenuOption()
 {
 	// TODO: Add your command handler code here
 	JhonnyOptionDlg dlgOption;
+	dlgOption.setOptDelay(optDelay);
+	dlgOption.setOptPlay(optVk, optMod);
+
 	if(dlgOption.DoModal()==IDOK)
 	{
 
+		optDelay = dlgOption.modOptDelay;
+		optVk = dlgOption.vk;
+		optMod = dlgOption.mod;
+
+		UnregisterHotKey(GetSafeHwnd(), hotKeyID);
+		if(!::RegisterHotKey(GetSafeHwnd(), hotKeyID, optMod, optVk))   // 추가
+			AfxMessageBox(_T("핫키 등록 실패"));                                  // 추가
+
+
+		saveOption();
 	}
 }
 
@@ -4663,6 +4717,68 @@ RECT JhonnyMain::getDlgRectRect()
 		rectDlg->ClientToScreen(&rectDlgRT);
 	}
 	return rectDlgRT;
+}
+
+
+int JhonnyMain::loadOption()
+{
+	CString loadOptPath = appEnvironmentPath + _T("jhonnyOpt");
+	basic_ifstream<TCHAR> input(loadOptPath, std::ios::in); 
+	std::locale mylocale("");   // get global locale
+	input.imbue(mylocale);
+	//input.imbue(std::locale(TCHARToString(countryISO)));
+	if (!input)
+	{ 
+		optDelay = 1.0;
+		optVk = VK_F4;
+		optMod = NULL;
+
+		saveOption();
+		std::cerr<<"Error reading to ..."<<std::endl; 
+		input.close();
+		return -1;
+	} 
+			
+			
+	std::vector<CString> data;
+	for(  TCHAR line[256]; input.getline(line, 256, '\n');)
+	{
+		data.push_back(line);
+	}
+
+	optDelay = _ttof(data.at(0));
+	optVk = _ttoi(data.at(1));
+	optMod = _ttoi(data.at(2));
+	//data.at(0);
+			
+
+	//runs.push_back(JhonnyRunItem(runID, runName, runNote, priority, repeatTime, virtualKeyCode, modifiers, moveX, moveY, leftClick, rightClick, sortNum, item, _ifItems));
+	input.close();
+}
+
+int JhonnyMain::saveOption()
+{
+	CString saveOptPath = appEnvironmentPath + _T("jhonnyOpt");
+	basic_ofstream<TCHAR> output(saveOptPath,  std::ios::out | std::ios::trunc );  
+	//output.imbue(std::locale(TCHARToString(countryISO)));
+	std::locale mylocale("");   // get global locale
+	output.imbue(mylocale);
+	if (!output)
+	{ 
+		std::cerr<<"Error writing to ..."<<std::endl; 
+		output.close();
+		return -1;
+	} 
+
+		
+	CString temp;
+	temp.Format(_T("%f"), optDelay);	
+	output << temp.GetBuffer() << std::endl;
+	temp.Format(_T("%d"), optVk);	
+	output << temp.GetBuffer() << std::endl;
+	temp.Format(_T("%d"), optMod);	
+	output << temp.GetBuffer() << std::endl;
+	output.close();
 }
 
 /*

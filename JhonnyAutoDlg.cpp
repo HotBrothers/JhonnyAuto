@@ -73,7 +73,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 	CString version;
 	CString content;
 
-	/*
+	
 	if(dlg.parse->getData(&data, VERSION) == 0)
 	{
 		int idx = data.Find(tokenizerVersion);
@@ -121,7 +121,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 			
 		}
 	}
-	*/
+	
 	
 
 	/*
