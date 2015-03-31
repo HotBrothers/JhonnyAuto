@@ -113,7 +113,7 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 			message += content;
 			if(IDYES == AfxMessageBox(message, MB_YESNO )) 
 			{
-				const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/75");
+				const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/4916");
 				::ShellExecute(NULL, _T("open"), helpUrl, NULL, NULL, SW_SHOW);
 				EndDialog(-1);
 				return ;
