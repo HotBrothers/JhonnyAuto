@@ -1481,6 +1481,12 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 
 	HWND hTargetHandle = hTempHandle;
 	CWnd* pWndTarget;
+
+	if(::IsWindowEnabled(hTargetHandle)==false)
+	{
+		hTargetHandle = ::GetParent(hTargetHandle);
+	}
+	/*
 	while(hTempHandle != NULL)
 	{
 		CRect r;
@@ -1499,7 +1505,7 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 		hTargetHandle = hTempHandle;
 					
 	}
-
+	*/
 	//core->setTargetWindow(hTargetHandle);
 
 	RECT WndTargetRT;
