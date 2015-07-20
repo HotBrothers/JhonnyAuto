@@ -1143,7 +1143,8 @@ void JhonnyMain::OnBnClickedButtonPlay()
 {
 	// TODO: Add your control notification handler code here
 	playAndStop();
-
+	//EventSend::SendMouseEvent(targetWindow, 35, 100, MOUSE_LCLICK);
+	//EventSend::SendMouseEvent(targetWindow, 10, 10, MOUSE_LCLICK);
 	
 }
 
@@ -1462,14 +1463,15 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 				
 	CWnd* pWndMainTmp = pTargetMainWindow;
 				
-	HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+	// CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT
+	HWND hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt,  CWP_SKIPDISABLED | CWP_SKIPINVISIBLE );
 	
 	// NULL 이면 Minimized 안된 곳에서 찾음
 	//bool isMinimizedTemp = isMainWindowMinimized;
 	if(hTempHandle == NULL)
 	{
 		handlePt.y -= outCoord;
-		hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+		hTempHandle = ::ChildWindowFromPointEx(pWndMainTmp->GetSafeHwnd(), handlePt,  CWP_SKIPDISABLED | CWP_SKIPINVISIBLE );
 		//isMainWindowMinimized = false;
 	}
 	// 그래도 NULL 이면 오류로 인정하고 실패리턴
@@ -1482,11 +1484,7 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 	HWND hTargetHandle = hTempHandle;
 	CWnd* pWndTarget;
 
-	if(::IsWindowEnabled(hTargetHandle)==false)
-	{
-		hTargetHandle = ::GetParent(hTargetHandle);
-	}
-	/*
+	// 최하위 핸들을 구함
 	while(hTempHandle != NULL)
 	{
 		CRect r;
@@ -1497,7 +1495,7 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 		handlePt.x = handlePt.x - r.left;
 		handlePt.y = handlePt.y - r.top;
 					
-		hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);	
+		hTempHandle = ::ChildWindowFromPointEx(pWndChildTmp->GetSafeHwnd(), handlePt, CWP_SKIPDISABLED | CWP_SKIPINVISIBLE );	
 			
 		if(hTargetHandle == hTempHandle || hTempHandle == NULL)
 			break;
@@ -1505,6 +1503,17 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 		hTargetHandle = hTempHandle;
 					
 	}
+
+	// 최하위 핸들이 마우스 이벤트를 받지 않는 핸들이면 상위 핸들로 교체
+	while(hTargetHandle != NULL)
+	{
+		if(::IsWindowEnabled(hTargetHandle)==true)
+			break;
+		hTargetHandle = ::GetParent(hTargetHandle);
+	}
+	
+	/*
+	
 	*/
 	//core->setTargetWindow(hTargetHandle);
 
@@ -1512,7 +1521,11 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 
 	pWndTarget = CWnd::FromHandle (hTargetHandle);
 	//CWnd* pWndTarget = CWnd::FromHandle (hTargetHandle);
-	pWndTarget->GetWindowRect(&WndTargetRT);
+	//pWndTarget->GetWindowRect(&WndTargetRT);
+
+	pWndTarget->GetClientRect(&WndTargetRT);
+	pWndTarget->ClientToScreen(&WndTargetRT);
+
 	rectDlg->GetClientRect(&rectDlgRect);
 	rectDlg->ClientToScreen(&rectDlgRect);
 
@@ -1678,7 +1691,7 @@ void JhonnyMain::playCore()
 			}
 		}
 		
-		if(++pcounter%300 == 0)
+		if(++pcounter%500 == 0)
 		{
 			pcounter = 0;
 
