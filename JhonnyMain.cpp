@@ -137,7 +137,23 @@ BOOL JhonnyMain::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 
-	
+	// 인증
+	char loginID[256]={0,};
+	char loginPass[256]={0,};
+	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(userID), 256, loginID, userID.GetLength(), NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0,  LPCTSTR(userPass), 256, loginPass, userPass.GetLength(), NULL, NULL);
+
+	int result = parse->signIn(loginID, loginPass);
+			
+	if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
+		setGeustMode(true);
+	else if(result != 0)
+	{
+		AfxMessageBox(_T("Network Error(Parse):\n네트워크 연결에 문제가 있거나\n인증되지 않은 아이디입니다.\n프로그램을 종료합니다."));
+		EndDialog(-1);
+	}
+
+
 
 
 	srand((unsigned int)time(NULL));
@@ -345,12 +361,14 @@ BOOL JhonnyMain::OnInitDialog()
 	this->GetClientRect(&rc);
 	this->SendMessage(WM_SIZE, (WPARAM)SIZE_RESTORED, MAKELPARAM(rc.Width(), rc.Height()));
 
-
-	hotKeyID = ::GlobalAddAtom(_T("jhonnyHotkey"));
-
-	if(!::RegisterHotKey(GetSafeHwnd(), hotKeyID, optMod, optVk))   // 추가
-		AfxMessageBox(_T("핫키 등록 실패"));                                  // 추가
+	CString hotKeyRandomID;
+	hotKeyRandomID.Format(L"jhonnyHotkey%d", rand()%10000);
+	hotKeyID = ::GlobalAddAtom(hotKeyRandomID);
 	
+	if(!::RegisterHotKey(GetSafeHwnd(), hotKeyID, optMod, optVk))   // 추가
+	{
+		AfxMessageBox(_T("핫키 등록 실패"));                                  // 추가
+	}
 	if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
 		setGeustMode(true);
 
@@ -1490,8 +1508,11 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 		CRect r;
 		CWnd* pWndChildTmp = CWnd::FromHandle(hTempHandle);
 
-		pWndChildTmp->GetWindowRect( r ); 
-		pWndMainTmp->ScreenToClient( r ); 
+		pWndChildTmp->GetClientRect(&r);
+		pWndChildTmp->ClientToScreen(&r);
+		pWndMainTmp->ScreenToClient(&r);
+
+
 		handlePt.x = handlePt.x - r.left;
 		handlePt.y = handlePt.y - r.top;
 					
@@ -1511,7 +1532,8 @@ HWND JhonnyMain::getTargetHandleFromPoint(int inputX, int inputY, int *transCoor
 			break;
 		hTargetHandle = ::GetParent(hTargetHandle);
 	}
-	
+	if(hTargetHandle == NULL)
+		return NULL;
 	/*
 	
 	*/
@@ -1691,6 +1713,7 @@ void JhonnyMain::playCore()
 			}
 		}
 		
+		/*
 		if(++pcounter%500 == 0)
 		{
 			pcounter = 0;
@@ -1714,6 +1737,7 @@ void JhonnyMain::playCore()
 			
 
 		}
+		*/
 		Sleep(optDelay*1000);
 		
 
