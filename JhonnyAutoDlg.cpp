@@ -69,16 +69,12 @@ CJhonnyAutoDlg::CJhonnyAutoDlg(CWnd* pParent /*=NULL*/)
 	if(dlg.HttpGetJhonnyVersionBaaS(notice, version) != 0)
 	{
 		TCHAR message[2048] = _T("현재 사용하시는 버전은 구버전 입니다.\n최신 버전을 다운 받으시겠습니까?\n\n\n");
-		StrCatW(message, _T("Version : "));
-		StrCatW(message, version);
-		StrCatW(message, _T("\n\n[업데이트 내용]\n"));
-		StrCatW(message, notice);
-		StrCatW(message, _T("\n\0"));
+
 		
 		
 		if(IDYES == AfxMessageBox(message, MB_YESNO )) 
 		{
-			const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/75");
+			const TCHAR* helpUrl = _T("http://cafe.naver.com/jhonnymacro/");
 			::ShellExecute(NULL, _T("open"), helpUrl, NULL, NULL, SW_SHOW);
 			EndDialog(-1);
 			return ;

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MfcUtil.h"
 #include <Shobjidl.h>
 

@@ -1599,6 +1599,7 @@ void JhonnyMain::playCore()
 		{
 			pcounter = 0;
 
+			/*
 			char szBuf[512] = "";
 			CString result =_T("fail");
 			result = HttpPostUserTokenBaaS(szBuf, 512, userID, userPass, NULL);
@@ -1610,6 +1611,7 @@ void JhonnyMain::playCore()
 			}
 			if(userID.Compare(_T(GUEST_MODE_ID)) == 0)
 				setGeustMode(true);
+			*/
 
 		}
 		Sleep(1000);
